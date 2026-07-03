@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Ilha Errante - Edição Minas e Armaduras</title>
+<title>Ilha Errante - Edição Continentes e Estações</title>
 <style>
   :root{
     --bg:#0a0a0f;
@@ -32,7 +32,7 @@
   .hot-slot .count{position:absolute;bottom:4px;right:6px;font-size:12px;color:#fff;text-shadow:1.5px 1.5px #000;}
   .hot-slot .key-hint{position:absolute;top:2px;left:4px;font-size:9px;color:#bbb;}
 
-  #inventoryScreen{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);width:320px;background:var(--mc-gui);border:4px solid var(--mc-border-dark);border-top-color:var(--mc-border-light);border-left-color:var(--mc-border-light);padding:14px;display:none;flex-direction:column;gap:10px;box-shadow:0 12px 30px rgba(0,0,0,0.7);z-index:100;color:#333;}
+  #inventoryScreen{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);width:340px;background:var(--mc-gui);border:4px solid var(--mc-border-dark);border-top-color:var(--mc-border-light);border-left-color:var(--mc-border-light);padding:14px;display:none;flex-direction:column;gap:10px;box-shadow:0 12px 30px rgba(0,0,0,0.7);z-index:100;color:#333;}
   .inv-title{font-size:14px;margin:0;color:#333;text-transform:uppercase;border-bottom:2px solid #8b8b8b;padding-bottom:4px;}
   
   #craftTableScreen{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);width:480px;background:#b2b2b2;border:4px solid #4a2711;padding:14px;display:none;flex-direction:column;gap:10px;box-shadow:0 12px 30px rgba(0,0,0,0.8);z-index:110;color:#111;}
@@ -46,7 +46,7 @@
   .mc-btn{background:#7a7a7a;border:3px solid #555;border-top-color:#fff;border-left-color:#fff;color:#fff;padding:6px 12px;cursor:pointer;font-size:11px;font-weight:bold;text-transform:uppercase;}
   .mc-btn.danger{background:#a93226;}
   .storage-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;}
-  .inv-slot{width:130px;height:45px;background:#8b8b8b;border:3px solid #373737;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;font-size:12px;}
+  .inv-slot{width:138px;height:45px;background:#8b8b8b;border:3px solid #373737;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;font-size:12px;}
 
   #instructions{position:absolute;top:12px;left:12px;font-size:11px;background:rgba(10,10,15,0.9);border:2px solid #444;border-radius:6px;padding:10px 14px;line-height:1.6;pointer-events:none;z-index:10;}
   
@@ -60,6 +60,17 @@
   #healthBarContainer{width:160px;height:20px;background:#441111;border:2px solid #fff;border-radius:4px;position:relative;overflow:hidden;}
   #healthBarFill{width:100%;height:100%;background:#cc2222;transition:width 0.2s;}
   #healthText{position:absolute;width:100%;text-align:center;font-size:11px;line-height:16px;color:#fff;text-shadow:1px 1px #000;}
+
+  /* Calendário e Clima */
+  #calendarWidget{background:rgba(20,20,30,0.85);border:2px solid #555;border-radius:6px;padding:6px 10px;font-size:11px;color:#00ffcc;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,0.4);text-align:right;}
+  #calendarWidget:hover{background:rgba(35,35,50,0.95);border-color:#00ffcc;}
+  #weatherDisplay{font-size:11px;color:#fff;text-shadow:1px 1px #000;}
+
+  /* Efeito de Cutscene */
+  #cutsceneOverlay{position:absolute;top:0;left:0;width:100%;height:100%;background:#000;display:none;align-items:center;justify-content:center;font-size:24px;color:#fff;z-index:300;text-shadow:2px 2px #555;letter-spacing:1px;animation:fadeInOut 4s forwards;}
+  @keyframes fadeInOut {
+    0% {opacity:0;} 15% {opacity:1;} 85% {opacity:1;} 100% {opacity:0;}
+  }
 </style>
 </head>
 <body>
@@ -69,12 +80,15 @@
     <canvas id="game" width="800" height="500"></canvas>
     
     <div id="uiTopRight">
+      <div id="calendarWidget" onclick="showCalendarDetails()">📅 Dia <span id="calDay">1</span> (<span id="calWeather">☀️ Sol</span>)</div>
       <div id="villageRank">🏡 Nível da Vila: <span id="vLevel">1</span> (<span id="vPoints">0</span>/5)</div>
       <div id="healthBarContainer">
         <div id="healthBarFill"></div>
         <div id="healthText">HP: 100/100</div>
       </div>
     </div>
+
+    <div id="cutsceneOverlay">Muitas horas de viagem depois...</div>
 
     <div id="mainMenu" class="menu-screen">
       <div class="menu-title">🌲 ILHA ERRANTE 🌲</div>
@@ -94,7 +108,7 @@
     <div id="instructions">
       <span style="color:#ffaa00; font-size:12px;">🎮 COMANDOS:</span><br>
       • Mover: <kbd>WASD</kbd> / Setas<br>
-      • Falar / Ações / Portais: <kbd>E</kbd><br>
+      • Ações / Portais / Barco: <kbd>E</kbd><br>
       • Recursos: <kbd>I</kbd><br>
       • Slots: <kbd>1</kbd> a <kbd>6</kbd><br>
       • <span style="color:#ff5555;">Teleporte: <kbd>R</kbd></span>
@@ -114,6 +128,8 @@
         <div class="inv-slot">Ferro<span id="inv-iron">0</span></div>
         <div class="inv-slot">Cristal<span id="inv-ore">0</span></div>
         <div class="inv-slot">Diamante<span id="inv-diamond">0</span></div>
+        <div class="inv-slot">Itens Estação<span id="inv-season">0</span></div>
+        <div class="inv-slot">Ferramenta<span id="inv-tool">Mão</span></div>
         <div class="inv-slot">Armadura<span id="inv-armor">Nenhuma</span></div>
       </div>
       <button class="mc-btn danger" onclick="toggleInventory()">Fechar [I]</button>
@@ -151,10 +167,10 @@
 
     <div id="hotbar">
       <div class="hot-slot active" id="slot-0"><span class="key-hint">1</span>Mão</div>
-      <div class="hot-slot" id="slot-1"><span class="key-hint">2</span><span>Mach.</span></div>
-      <div class="hot-slot" id="slot-2"><span class="key-hint">3</span><span id="icon-pick">🔒</span></div>
-      <div class="hot-slot" id="slot-3"><span class="key-hint">4</span>Cob.<span class="count" id="hot-copper">0</span></div>
-      <div class="hot-slot" id="slot-4"><span class="key-hint">5</span>Fer.<span class="count" id="hot-iron">0</span></div>
+      <div class="hot-slot" id="slot-1"><span class="key-hint">2</span><span>Machado</span></div>
+      <div class="hot-slot" id="slot-2"><span class="key-hint">3</span><span id="icon-pick">🔒 Pic.</span></div>
+      <div class="hot-slot" id="slot-3"><span class="key-hint">4</span><span id="icon-shovel">🔒 Pá</span></div>
+      <div class="hot-slot" id="slot-4"><span class="key-hint">5</span><span id="icon-sword">🔒 Esp.</span></div>
       <div class="hot-slot" id="slot-5"><span class="key-hint">6</span>Carro<span class="count" id="hot-car">0</span></div>
     </div>
   </div>
@@ -173,60 +189,91 @@
 
   let villagePoints = 0;
   let villageLevel = 1;
+  let boatSpawnedAlertTriggered = false;
+
+  // Sistema de Calendário e Clima
+  let gameTime = 0; 
+  let currentDay = 1;
+  let currentMonth = 1;
+  let currentYear = 1;
+  const STATIONS = ["Primavera", "Verão", "Outono", "Inverno"];
+  let currentStation = "Primavera";
+  const WEATHERS = ["Sol", "Chuva", "Nublado", "Sereno"];
+  let currentWeather = "Sol";
 
   // Sistema de Vida e Combate
   let playerHP = 100;
   let hasArmor = false;
   let hitCooldown = 0;
 
-  // Sistema de Localizações (Superfície vs Interior vs Minas)
-  let currentMap = "surface"; // surface, house_interior, mine_1, mine_2, mine_3
+  // Mapas e Continentes
+  let currentMap = "surface"; // surface, house_interior, mine_1, mine_2, mine_3, continent_2, city
   let houseBuilt = false;
 
-  const BIOME = { WATER:'water', GRASS:'grass', MOUNTAIN:'mountain', MINE_FLOOR:'mine_floor', WALL:'wall', HOUSE_FLOOR:'house_floor' };
-  const COLORS = { water:'#1b4965', grass:'#2a9d8f', mountain:'#4a4e69', mine_floor:'#2b2b2b', wall:'#151515', house_floor:'#78350f' };
+  const BIOME = { WATER:'water', GRASS:'grass', MOUNTAIN:'mountain', MINE_FLOOR:'mine_floor', WALL:'wall', HOUSE_FLOOR:'house_floor', SAND:'sand', SNOW:'snow', CITY_FLOOR:'city_floor' };
+  const COLORS = { water:'#1b4965', grass:'#2a9d8f', mountain:'#4a4e69', mine_floor:'#2b2b2b', wall:'#151515', house_floor:'#78350f', sand:'#e9c46a', snow:'#e2e8f0', city_floor:'#475569' };
   const BLOCKING = new Set([BIOME.WATER, BIOME.MOUNTAIN, BIOME.WALL]);
 
   let speedMultiplierWalk = 1.0;
   let speedMultiplierCar = 3.3;
 
-  const inventory = { wood: 0, copper: 0, iron: 0, ore: 0, diamond: 0, car: 0, pets: 0, pickaxeTier: 0, ridingCar: false };
+  const inventory = { 
+    wood: 0, copper: 0, iron: 0, ore: 0, diamond: 0, car: 0, pets: 0, seasonItems: 0,
+    pickaxeTier: 0, shovelTier: 0, swordTier: 0, ridingCar: false 
+  };
+  
   let activeSlot = 0, inventoryOpen = false, craftTableOpen = false;
   let currentInteractingNPC = null; 
 
   const craftGrid = Array(9).fill(""); 
-  const resourceNodes = [];
+  let resourceNodes = [];
   const monsters = [];
   const followedPets = [];
 
   let startX = Math.floor(WORLD / 2);
   let startY = Math.floor(WORLD / 2);
   
-  // Grids de mapas diferentes
   const maps = {
     surface: new Array(WORLD),
     house_interior: new Array(WORLD),
     mine_1: new Array(WORLD),
     mine_2: new Array(WORLD),
-    mine_3: new Array(WORLD)
+    mine_3: new Array(WORLD),
+    continent_2: new Array(WORLD),
+    city: new Array(WORLD)
   };
 
-  // Inicializar mapa da Superfície
-  for(let x=0; x<WORLD; x++){
-    maps.surface[x] = new Array(WORLD);
-    for(let y=0; y<WORLD; y++){
-      let isEdge = (x < 2 || x > WORLD-3 || y < 2 || y > WORLD-3);
-      let biome = isEdge ? BIOME.WATER : (Math.random() > 0.88 ? BIOME.MOUNTAIN : BIOME.GRASS);
-      maps.surface[x][y] = { biome: biome, seed: Math.random() };
+  // Inicializar mapa da Superfície Básica
+  function initSurfaceMap(mapName, customBiomeGenerator) {
+    resourceNodes = resourceNodes.filter(n => n.map !== mapName);
+    for(let x=0; x<WORLD; x++){
+      maps[mapName][x] = new Array(WORLD);
+      for(let y=0; y<WORLD; y++){
+        let isEdge = (x < 2 || x > WORLD-3 || y < 2 || y > WORLD-3);
+        let biome = isEdge ? BIOME.WATER : (Math.random() > 0.88 ? BIOME.MOUNTAIN : BIOME.GRASS);
+        
+        if (customBiomeGenerator && !isEdge) {
+          biome = customBiomeGenerator(x, y, biome);
+        }
 
-      if(!isEdge && biome === BIOME.GRASS && Math.random() > 0.93) {
-        resourceNodes.push({ map: 'surface', type: 'tree', x: (x+0.5)*TILE, y: (y+0.5)*TILE, hp: 3, size: 12 });
-      }
-      if(!isEdge && biome === BIOME.MOUNTAIN && Math.random() > 0.85) {
-        resourceNodes.push({ map: 'surface', type: 'copper', x: (x+0.5)*TILE, y: (y+0.5)*TILE, hp: 3 });
+        maps[mapName][x][y] = { biome: biome, seed: Math.random() };
+
+        if(!isEdge && biome !== BIOME.WATER && biome !== BIOME.MOUNTAIN) {
+          if (Math.random() > 0.93) {
+            resourceNodes.push({ map: mapName, type: 'tree', x: (x+0.5)*TILE, y: (y+0.5)*TILE, hp: 3, size: 12 });
+          }
+          if (Math.random() > 0.96) {
+            resourceNodes.push({ map: mapName, type: 'dirt_pile', x: (x+0.5)*TILE, y: (y+0.5)*TILE, hp: 1 });
+          }
+        }
+        if(!isEdge && biome === BIOME.MOUNTAIN && Math.random() > 0.85) {
+          resourceNodes.push({ map: mapName, type: 'copper', x: (x+0.5)*TILE, y: (y+0.5)*TILE, hp: 3 });
+        }
       }
     }
   }
+
+  initSurfaceMap('surface', null);
 
   // Inicializar Minas e Interiores
   const initSimpleMap = (mapName, floorBiome, wallBiome) => {
@@ -242,6 +289,15 @@
   initSimpleMap('mine_1', BIOME.MINE_FLOOR, BIOME.MOUNTAIN);
   initSimpleMap('mine_2', BIOME.MINE_FLOOR, BIOME.MOUNTAIN);
   initSimpleMap('mine_3', BIOME.MINE_FLOOR, BIOME.MOUNTAIN);
+
+  // Inicializar Cidadezinha
+  for(let x=0; x<WORLD; x++){
+    maps.city[x] = new Array(WORLD);
+    for(let y=0; y<WORLD; y++){
+      let isEdge = (x < 3 || x > WORLD-4 || y < 3 || y > WORLD-4);
+      maps.city[x][y] = { biome: isEdge ? BIOME.WATER : BIOME.CITY_FLOOR };
+    }
+  }
 
   // Gerar Minérios Específicos e Monstros nas Minas
   const seedMine = (mapName, oreType, spiderType, count) => {
@@ -265,7 +321,7 @@
   seedMine('mine_2', 'ore', 'normal', 15); 
   seedMine('mine_3', 'diamond', 'poison', 12); 
 
-  // Forçar área de segurança ao redor do spawn
+  // Forçar área de segurança ao redor do spawn na ilha principal
   for(let i=-5; i<=5; i++){
     for(let j=-5; j<=5; j++) maps.surface[startX+i][startY+j].biome = BIOME.GRASS;
   }
@@ -286,12 +342,12 @@
   ];
 
   const npcs = [
-    { id: 'mercador', name: 'MERCADOR', color: '#4f46e5', minLevel: 1, map: 'surface', x:(startX-1.5)*TILE, y:(startY-1.5)*TILE, startX:(startX-1.5)*TILE, startY:(startY-1.5)*TILE, targetX:(startX-1.5)*TILE, targetY:(startY-1.5)*TILE, timer:0, chatBubble:"", chatTimer:0, offerCooldown:0 },
-    { id: 'domador', name: 'DOMADOR', color: '#16a34a', minLevel: 1, map: 'surface', x:(startX+1.5)*TILE, y:(startY+1.5)*TILE, startX:(startX+1.5)*TILE, startY:(startY+1.5)*TILE, targetX:(startX+1.5)*TILE, targetY:(startY+1.5)*TILE, timer:0, chatBubble:"", chatTimer:0, offerCooldown:0 },
-    { id: 'alquimista', name: 'ALQUIMISTA', color: '#a855f7', minLevel: 2, map: 'surface', x:(startX-3.0)*TILE, y:(startY+2.0)*TILE, startX:(startX-3.0)*TILE, startY:(startY+2.0)*TILE, targetX:(startX-3.0)*TILE, targetY:(startY+2.0)*TILE, timer:0, chatBubble:"", chatTimer:0, offerCooldown:0 },
-    { id: 'engenheiro', name: 'ENGENHEIRO', color: '#ea580c', minLevel: 3, map: 'surface', x:(startX+3.0)*TILE, y:(startY-2.5)*TILE, startX:(startX+3.0)*TILE, startY:(startY-2.5)*TILE, targetX:(startX+3.0)*TILE, targetY:(startY-2.5)*TILE, timer:0, chatBubble:"", chatTimer:0, offerCooldown:0 },
-    { id: 'pedreiro', name: 'PEDREIRO', color: '#64748b', minLevel: 4, map: 'surface', x:(startX-4.0)*TILE, y:(startY-1.0)*TILE, startX:(startX-4.0)*TILE, startY:(startY-1.0)*TILE, targetX:(startX-4.0)*TILE, targetY:(startY-1.0)*TILE, timer:0, chatBubble:"", chatTimer:0, offerCooldown:0 },
-    { id: 'armador', name: 'ARMADOR', color: '#06b6d4', minLevel: 5, map: 'surface', x:(startX+4.0)*TILE, y:(startY+0.5)*TILE, startX:(startX+4.0)*TILE, startY:(startY+0.5)*TILE, targetX:(startX+4.0)*TILE, targetY:(startY+0.5)*TILE, timer:0, chatBubble:"", chatTimer:0, offerCooldown:0 }
+    { id: 'mercador', name: 'MERCADOR', color: '#4f46e5', minLevel: 1, map: 'surface', x:(startX-1.5)*TILE, y:(startY-1.5)*TILE, startX:(startX-1.5)*TILE, startY:(startY-1.5)*TILE, targetX:(startX-1.5)*TILE, targetY:(startY-1.5)*TILE, timer:0 },
+    { id: 'domador', name: 'DOMADOR', color: '#16a34a', minLevel: 1, map: 'surface', x:(startX+1.5)*TILE, y:(startY+1.5)*TILE, startX:(startX+1.5)*TILE, startY:(startY+1.5)*TILE, targetX:(startX+1.5)*TILE, targetY:(startY+1.5)*TILE, timer:0 },
+    { id: 'alquimista', name: 'ALQUIMISTA', color: '#a855f7', minLevel: 2, map: 'surface', x:(startX-3.0)*TILE, y:(startY+2.0)*TILE, startX:(startX-3.0)*TILE, startY:(startY+2.0)*TILE, targetX:(startX-3.0)*TILE, targetY:(startY+2.0)*TILE, timer:0 },
+    { id: 'engenheiro', name: 'ENGENHEIRO', color: '#ea580c', minLevel: 3, map: 'surface', x:(startX+3.0)*TILE, y:(startY-2.5)*TILE, startX:(startX+3.0)*TILE, startY:(startY-2.5)*TILE, targetX:(startX+3.0)*TILE, targetY:(startY-2.5)*TILE, timer:0 },
+    { id: 'pedreiro', name: 'PEDREIRO', color: '#64748b', minLevel: 4, map: 'surface', x:(startX-4.0)*TILE, y:(startY-1.0)*TILE, startX:(startX-4.0)*TILE, startY:(startY-1.0)*TILE, targetX:(startX-4.0)*TILE, targetY:(startY-1.0)*TILE, timer:0 },
+    { id: 'armador', name: 'ARMADOR', color: '#06b6d4', minLevel: 5, map: 'surface', x:(startX+4.0)*TILE, y:(startY+0.5)*TILE, startX:(startX+4.0)*TILE, startY:(startY+0.5)*TILE, targetX:(startX+4.0)*TILE, targetY:(startY+0.5)*TILE, timer:0 }
   ];
 
   const canvas = document.getElementById('game');
@@ -345,10 +401,22 @@
   function addVillagePoint() {
     villagePoints++;
     let nextLevelGoal = villageLevel * 5;
-    if(villagePoints >= nextLevelGoal) { villageLevel++; }
+    if(villagePoints >= nextLevelGoal) { 
+      villageLevel++; 
+      if(villageLevel === 5 && !boatSpawnedAlertTriggered) {
+        boatSpawnedAlertTriggered = true;
+        openSystemDialog("AVISO IMPORTANTE", "A Vila atingiu o Nível 5! Um Barco de Exploração atracou na ponta esquerda da praia!", []);
+        setTimeout(closeDialogMenu, 4000);
+      }
+    }
     document.getElementById('vLevel').textContent = villageLevel;
     document.getElementById('vPoints').textContent = villagePoints + "/" + nextLevelGoal;
   }
+
+  window.showCalendarDetails = function() {
+    openSystemDialog("CALENDÁRIO", `Ano: ${currentYear} | Mês: ${currentMonth}<br>Estação Atual: ${currentStation}<br>Clima Hoje: ${currentWeather}<br><br>💡 No Mês 5 do Ano 1, um Heliponto será concluído!`, []);
+    setTimeout(closeDialogMenu, 4000);
+  };
 
   function toggleInventory() {
     if(craftTableOpen || currentInteractingNPC) return; inventoryOpen = !inventoryOpen;
@@ -358,6 +426,13 @@
     document.getElementById('inv-iron').textContent = inventory.iron;
     document.getElementById('inv-ore').textContent = inventory.ore;
     document.getElementById('inv-diamond').textContent = inventory.diamond;
+    document.getElementById('inv-season').textContent = inventory.seasonItems;
+    
+    let currentT = "Mão";
+    if (activeSlot === 2) currentT = inventory.pickaxeTier === 2 ? "Pic. Cristal" : inventory.pickaxeTier === 1 ? "Pic. Cobre" : "Nenhuma";
+    if (activeSlot === 3) currentT = inventory.shovelTier === 2 ? "Pá Cristal" : inventory.shovelTier === 1 ? "Pá Cobre" : "Nenhuma";
+    if (activeSlot === 4) currentT = inventory.swordTier === 2 ? "Esp. Cristal" : inventory.swordTier === 1 ? "Esp. Cobre" : "Nenhuma";
+    document.getElementById('inv-tool').textContent = currentT;
     document.getElementById('inv-armor').textContent = hasArmor ? "Lendária (50% Defesa)" : "Nenhuma";
   }
   window.toggleInventory = toggleInventory;
@@ -369,7 +444,7 @@
   window.allowDrop = ev => ev.preventDefault();
   window.drag = ev => ev.dataTransfer.setData("text", ev.target.id);
   window.drop = (ev, idx) => {
-    ev.preventDefault(); const data = ev.dataTransfer.getDataTransfer ? ev.dataTransfer.getData("text") : ev.dataTransfer.getData("text");
+    ev.preventDefault(); const data = ev.dataTransfer.getData ? ev.dataTransfer.getData("text") : "";
     if(craftGrid[idx] !== "") return;
     if(data === "drag-wood" && inventory.wood > 0) { inventory.wood--; craftGrid[idx] = "wood"; }
     else if(data === "drag-copper" && inventory.copper > 0) { inventory.copper--; craftGrid[idx] = "copper"; }
@@ -380,11 +455,11 @@
   };
   window.removeIngredient = idx => {
     let mat = craftGrid[idx];
-    if(mat) { inventory[mat==='ore'?'ore':mat]++; craftGrid[idx] = ""; }
+    if(mat) { inventory[mat]++; craftGrid[idx] = ""; }
     updateMaterialsDragCount(); renderCraftGrid(); updateHotbarUI();
   };
   window.clearCraftingGrid = () => {
-    for(let i=0; i<9; i++) { if(craftGrid[i]) { inventory[craftGrid[i]==='ore'?'ore':craftGrid[i]]++; craftGrid[i]=""; } }
+    for(let i=0; i<9; i++) { if(craftGrid[i]) { inventory[craftGrid[i]]++; craftGrid[i]=""; } }
     updateMaterialsDragCount(); renderCraftGrid(); updateHotbarUI();
   };
   function updateMaterialsDragCount() {
@@ -401,29 +476,140 @@
 
   window.craftItem3x3 = function() {
     const r = craftGrid;
+    // Picaretas
     if((r[0]==="copper"||r[0]==="ore") && r[1]===r[0] && r[2]===r[0] && r[4]==="wood" && r[7]==="wood") {
       inventory.pickaxeTier = r[0]==="ore" ? 2 : 1;
       openSystemDialog("SISTEMA", "Picareta construída! Agora use o Slot 3 para minerar.", []);
-      craftGrid.fill(""); closeCraftTable();
-      setTimeout(closeDialogMenu, 1500); // ADICIONADO: Mensagem agora fecha automaticamente após 1.5s
+      craftGrid.fill(""); closeCraftTable(); setTimeout(closeDialogMenu, 1500);
     } 
+    // Pás (Formato vertical de T inverso ou simples)
+    else if((r[1]==="copper"||r[1]==="ore") && r[4]==="wood" && r[7]==="wood") {
+      inventory.shovelTier = r[1]==="ore" ? 2 : 1;
+      openSystemDialog("SISTEMA", "Pá construída! Agora use o Slot 4 para cavar pilhas de terra.", []);
+      craftGrid.fill(""); closeCraftTable(); setTimeout(closeDialogMenu, 1500);
+    }
+    // Espadas (Lâmina em linha vertical)
+    else if((r[1]==="copper"||r[1]==="ore") && r[4]===r[1] && r[7]==="wood") {
+      inventory.swordTier = r[1]==="ore" ? 2 : 1;
+      openSystemDialog("SISTEMA", "Espada construída! Use o Slot 5 para combater aranhas rapidamente.", []);
+      craftGrid.fill(""); closeCraftTable(); setTimeout(closeDialogMenu, 1500);
+    }
+    // Carro
     else if(r[3]==="ore" && r[4]==="ore" && r[5]==="ore" && r[6]==="wood" && r[7]==="ore" && r[8]==="wood") {
       inventory.car++; openSystemDialog("SISTEMA", "Carro construído! Use o Slot 6.", []);
-      craftGrid.fill(""); closeCraftTable();
-      setTimeout(closeDialogMenu, 1500); // ADICIONADO: Mensagem agora fecha automaticamente após 1.5s
+      craftGrid.fill(""); closeCraftTable(); setTimeout(closeDialogMenu, 1500);
     } else { openSystemDialog("SISTEMA", "Receita incorreta!", []); }
     updateHotbarUI();
   };
 
   function openSystemDialog(name, text, options) {
-    document.getElementById('dName').textContent = name;
-    document.getElementById('dText').textContent = text;
+    document.getElementById('dName').innerHTML = name;
+    document.getElementById('dText').innerHTML = text;
     const optsDiv = document.getElementById('dOpts'); optsDiv.innerHTML = "";
     options.forEach(opt => {
       const btn = document.createElement('button'); btn.className = "opt-btn";
       btn.textContent = opt.label; btn.onclick = () => opt.action(); optsDiv.appendChild(btn);
     });
     document.getElementById('dialog').style.display = 'block';
+  }
+
+  function triggerTravelCutscene(targetMapName, spawnX, spawnY) {
+    const overlay = document.getElementById('cutsceneOverlay');
+    overlay.style.display = 'flex';
+    gameRunning = false;
+    
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      gameRunning = true;
+      currentMap = targetMapName;
+      player.x = spawnX;
+      player.y = spawnY;
+    }, 4000);
+  }
+
+  function generateIAContinent() {
+    // IA procedural gerando biomas baseados na estação ou de forma mista
+    const biomeRnd = Math.random();
+    let generator = null;
+    
+    if (biomeRnd < 0.33) {
+      // Bioma de Deserto/Praia Seca
+      generator = (x, y, currentB) => (currentB === BIOME.MOUNTAIN ? BIOME.MOUNTAIN : BIOME.SAND);
+    } else if (biomeRnd < 0.66) {
+      // Bioma de Neve Extrema
+      generator = (x, y, currentB) => (currentB === BIOME.MOUNTAIN ? BIOME.MOUNTAIN : BIOME.SNOW);
+    } else {
+      // Bioma Floresta de Outono Denso
+      generator = (x, y, currentB) => currentB;
+    }
+    
+    initSurfaceMap('continent_2', generator);
+  }
+
+  function tryInteract(){
+    if(currentInteractingNPC) return;
+
+    // Interação com o Barco (na ponta esquerda da praia: x ~ 2*TILE, y ~ centro)
+    if (villageLevel >= 5 && Math.hypot((2.5*TILE) - player.x, (Math.floor(WORLD/2)*TILE) - player.y) < 50) {
+      if (currentMap === 'surface') {
+        generateIAContinent(); // IA gera um bioma inédito toda vez que viaja
+        triggerTravelCutscene('continent_2', (WORLD-4)*TILE, (Math.floor(WORLD/2)*TILE));
+      } else if (currentMap === 'continent_2') {
+        triggerTravelCutscene('surface', 4*TILE, (Math.floor(WORLD/2)*TILE));
+      }
+      return;
+    }
+
+    // Interação com o Heliponto / Helicóptero (Fica pronto no mês 5 do Ano 1)
+    if ((currentYear > 1 || currentMonth >= 5) && Math.hypot((4*TILE) - player.x, (Math.floor(WORLD/2 - 2)*TILE) - player.y) < 50) {
+      if (currentMap === 'surface') {
+        triggerTravelCutscene('city', (WORLD/2)*TILE, (WORLD-5)*TILE);
+      } else if (currentMap === 'city') {
+        triggerTravelCutscene('surface', 4*TILE, (Math.floor(WORLD/2 - 4)*TILE));
+      }
+      return;
+    }
+
+    for(const p of portals) {
+      if(currentMap === p.from && Math.hypot(p.x - player.x, p.y - player.y) < 32) {
+        if(p.requiresHouse && !houseBuilt) {
+          openSystemDialog("SISTEMA", "Fale com o Pedreiro no Nível 4 para construir esta casa primeiro!", []);
+          setTimeout(closeDialogMenu, 2000); return;
+        }
+        currentMap = p.to;
+        if(p.to === 'house_interior') { player.x = (WORLD/2)*TILE; player.y = (WORLD - 7)*TILE; }
+        else { player.x = p.x; player.y = p.y + 35; }
+        return;
+      }
+    }
+
+    if(currentMap === craftingTable.map && Math.hypot(craftingTable.x - player.x, craftingTable.y - player.y) < 45) {
+      if(!craftTableOpen) openCraftTable(); else closeCraftTable(); return;
+    }
+
+    if (activeSlot === 5 && inventory.car > 0) { inventory.ridingCar = !inventory.ridingCar; return; }
+
+    for(const npc of npcs) {
+      if(currentMap === npc.map && villageLevel >= npc.minLevel && Math.hypot(npc.x - player.x, npc.y - player.y) < 45) {
+        handleNPCMenu(npc); return;
+      }
+    }
+
+    for(const node of resourceNodes) {
+      if(node.map === currentMap && node.hp > 0 && Math.hypot(node.x - player.x, node.y - player.y) < 42) {
+        if(node.type === 'tree' && activeSlot === 1) { node.hp = 0; inventory.wood += 2; if(currentStation==="Outono") inventory.seasonItems += 1; }
+        else if(node.type === 'dirt_pile' && activeSlot === 3 && inventory.shovelTier > 0) { node.hp = 0; inventory.seasonItems += 2; }
+        else if(node.type === 'copper' && activeSlot === 2 && inventory.pickaxeTier >= 0) { node.hp = 0; inventory.copper += 2; }
+        else if(node.type === 'iron' && activeSlot === 2 && inventory.pickaxeTier >= 1) { node.hp = 0; inventory.iron += 2; }
+        else if(node.type === 'ore' && activeSlot === 2 && inventory.pickaxeTier >= 1) { node.hp = 0; inventory.ore += 2; }
+        else if(node.type === 'diamond' && activeSlot === 2 && inventory.pickaxeTier >= 2) { node.hp = 0; inventory.diamond += 2; }
+        else {
+          openSystemDialog("AVISO", "Você precisa equipar a ferramenta certa ou nível maior!", []);
+          setTimeout(closeDialogMenu, 1500); return;
+        }
+        updateHotbarUI(); return;
+      }
+    }
   }
 
   function handleNPCMenu(npc) {
@@ -454,7 +640,7 @@
       ]);
     }
     else if(npc.id === 'pedreiro') {
-      let msg = houseBuilt ? "Sua casa já está pronta e linda! O interior está livre." : "Posso expandir sua casa e dar um interior completo para ela! Custo: 20 Cristais.";
+      let msg = houseBuilt ? "Sua casa já está pronta e linda!" : "Posso expandir sua casa e dar um interior completo! Custo: 20 Cristais.";
       let opts = houseBuilt ? [{ label: "Sair", action: () => closeDialogMenu() }] : [
         { label: "Construir Casa (20 Cristais)", action: () => processTrade(npc, 'house') },
         { label: "Depois", action: () => closeDialogMenu() }
@@ -462,7 +648,7 @@
       openSystemDialog(npc.name, msg, opts);
     }
     else if(npc.id === 'armador') {
-      let msg = hasArmor ? "Sua Armadura Lendária está equipada. Você está protegido!" : "Posso forjar uma Armadura Lendária protetora! Requisitos: 5 Ferros e 5 Diamantes.";
+      let msg = hasArmor ? "Sua Armadura Lendária está equipada." : "Posso forjar uma Armadura Lendária! Requisitos: 5 Ferros e 5 Diamantes.";
       let opts = hasArmor ? [{ label: "Sair", action: () => closeDialogMenu() }] : [
         { label: "Forjar Armadura", action: () => processTrade(npc, 'armor') },
         { label: "Voltar", action: () => closeDialogMenu() }
@@ -489,77 +675,55 @@
     else if(npc.id === 'pedreiro' && inventory.ore >= 20 && !houseBuilt) {
       inventory.ore -= 20; houseBuilt = true; addVillagePoint();
       craftingTable.map = 'house_interior';
-      craftingTable.x = (WORLD / 2)*TILE;
-      craftingTable.y = (WORLD / 2 - 2)*TILE;
-      openSystemDialog(npc.name, "Casa construída! A bancada de trabalho foi movida para dentro dela automaticamente!", [{ label: "Excelente!", action: () => closeDialogMenu() }]);
+      craftingTable.x = (WORLD / 2)*TILE; craftingTable.y = (WORLD / 2 - 2)*TILE;
+      closeDialogMenu();
     }
     else if(npc.id === 'armador' && inventory.iron >= 5 && inventory.diamond >= 5 && !hasArmor) {
       inventory.iron -= 5; inventory.diamond -= 5; hasArmor = true; addVillagePoint(); updateHotbarUI();
-      openSystemDialog(npc.name, "Armadura Lendária Forjada! Agora você recebe metade do dano das aranhas!", [{ label: "Perfeito!", action: () => closeDialogMenu() }]);
+      closeDialogMenu();
     }
     else {
-      openSystemDialog(npc.name, "Recursos insuficientes para esta transação!", [{ label: "Voltar", action: () => handleNPCMenu(npc) }]);
+      openSystemDialog(npc.name, "Recursos insuficientes!", [{ label: "Voltar", action: () => handleNPCMenu(npc) }]);
     }
   }
 
   function closeDialogMenu() { document.getElementById('dialog').style.display = 'none'; currentInteractingNPC = null; }
 
-  function tryInteract(){
-    if(currentInteractingNPC) return;
-
-    for(const p of portals) {
-      if(currentMap === p.from && Math.hypot(p.x - player.x, p.y - player.y) < 32) {
-        if(p.requiresHouse && !houseBuilt) {
-          openSystemDialog("SISTEMA", "Fale com o Pedreiro no Nível 4 para construir esta casa primeiro!", []);
-          setTimeout(closeDialogMenu, 2000); return;
-        }
-        currentMap = p.to;
-        if(p.to === 'house_interior') { player.x = (WORLD/2)*TILE; player.y = (WORLD - 7)*TILE; }
-        else { player.x = p.x; player.y = p.y + 35; }
-        return;
-      }
-    }
-
-    if(currentMap === craftingTable.map && Math.hypot(craftingTable.x - player.x, craftingTable.y - player.y) < 45) {
-      if(!craftTableOpen) openCraftTable(); else closeCraftTable(); return;
-    }
-
-    if (activeSlot === 5 && inventory.car > 0) { inventory.ridingCar = !inventory.ridingCar; return; }
-
-    for(const npc of npcs) {
-      if(currentMap === npc.map && villageLevel >= npc.minLevel && Math.hypot(npc.x - player.x, npc.y - player.y) < 45) {
-        handleNPCMenu(npc); return;
-      }
-    }
-
-    for(const node of resourceNodes) {
-      if(node.map === currentMap && node.hp > 0 && Math.hypot(node.x - player.x, node.y - player.y) < 42) {
-        if(node.type === 'tree' && activeSlot === 1) { node.hp = 0; inventory.wood += 2; }
-        else if(node.type === 'copper' && activeSlot === 2 && inventory.pickaxeTier >= 0) { node.hp = 0; inventory.copper += 2; }
-        else if(node.type === 'iron' && activeSlot === 2 && inventory.pickaxeTier >= 1) { node.hp = 0; inventory.iron += 2; }
-        else if(node.type === 'ore' && activeSlot === 2 && inventory.pickaxeTier >= 1) { node.hp = 0; inventory.ore += 2; }
-        else if(node.type === 'diamond' && activeSlot === 2 && inventory.pickaxeTier >= 2) { node.hp = 0; inventory.diamond += 2; }
-        else {
-          openSystemDialog("AVISO", "Sua picareta atual não é forte o bastante para este minério!", []);
-          setTimeout(closeDialogMenu, 1500); return;
-        }
-        updateHotbarUI(); return;
-      }
-    }
-  }
-
   function updateHotbarUI() {
     for(let i=0; i<6; i++) document.getElementById(`slot-${i}`).classList.remove('active');
     document.getElementById(`slot-${activeSlot}`).classList.add('active');
-    document.getElementById('icon-pick').textContent = inventory.pickaxeTier === 2 ? "Pic.Cristal" : inventory.pickaxeTier === 1 ? "Pic.Cobre" : "🔒";
-    document.getElementById('hot-copper').textContent = inventory.copper;
-    document.getElementById('hot-iron').textContent = inventory.iron;
+    document.getElementById('icon-pick').textContent = inventory.pickaxeTier === 2 ? "Pic. Cristal" : inventory.pickaxeTier === 1 ? "Pic. Cobre" : "🔒 Pic.";
+    document.getElementById('icon-shovel').textContent = inventory.shovelTier === 2 ? "Pá Cristal" : inventory.shovelTier === 1 ? "Pá Cobre" : "🔒 Pá";
+    document.getElementById('icon-sword').textContent = inventory.swordTier === 2 ? "Esp. Cristal" : inventory.swordTier === 1 ? "Esp. Cobre" : "🔒 Esp.";
     document.getElementById('hot-car').textContent = inventory.car;
   }
 
   function updateGame(dt){
     if(!gameRunning || craftTableOpen) return;
     if(hitCooldown > 0) hitCooldown -= dt;
+
+    // Passagem do tempo e calendário
+    gameTime += dt;
+    if (gameTime >= 8) { // A cada 8 segundos avança 1 dia
+      gameTime = 0;
+      currentDay++;
+      if (currentDay > 10) { // Meses curtos para dinâmica acelerada
+        currentDay = 1;
+        currentMonth++;
+        // Troca de Clima aleatória mensal
+        currentWeather = WEATHERS[Math.floor(Math.random() * WEATHERS.length)];
+        // Troca de Estação
+        currentStation = STATIONS[(currentMonth - 1) % 4];
+        if (currentMonth > 12) {
+          currentMonth = 1;
+          currentYear++;
+        }
+      }
+      document.getElementById('calDay').textContent = currentDay + " (Mês " + currentMonth + ")";
+      
+      let weatherIcons = { "Sol":"☀️ Sol", "Chuva":"🌧️ Chuva", "Nublado":"☁️ Nubl.", "Sereno":"🌫️ Sereno" };
+      document.getElementById('calWeather').textContent = weatherIcons[currentWeather];
+    }
 
     let dx=0, dy=0; waveTicks++;
     if(keys['w']||keys['arrowup']) dy-=1; if(keys['s']||keys['arrowdown']) dy+=1;
@@ -570,20 +734,29 @@
     if(dx||dy){
       const len=Math.hypot(dx,dy);
       let currentSpeed = player.speed * (inventory.ridingCar ? speedMultiplierCar : speedMultiplierWalk);
+      // Reduzir velocidade se estiver chovendo ou nevando/sereno
+      if (currentWeather === "Chuva" || currentWeather === "Sereno") currentSpeed *= 0.85;
+
       const nx = player.x + (dx/len)*currentSpeed*dt; const ny = player.y + (dy/len)*currentSpeed*dt;
       
       let tx = Math.floor(nx/TILE), ty = Math.floor(ny/TILE);
-      if(tx>=0 && tx<WORLD && ty>=0 && ty<WORLD && !BLOCKING.has(currentGrid[tx][ty].biome)) {
+      if(tx>=0 && tx<WORLD && ty>=0 && ty<WORLD && currentGrid[tx] && !BLOCKING.has(currentGrid[tx][ty].biome)) {
         player.x = nx; player.y = ny;
       }
     }
 
+    // Comportamento dos Monstros
     monsters.forEach(m => {
       if(m.map !== currentMap) return;
       let dist = Math.hypot(player.x - m.x, player.y - m.y);
       
       if(dist < 20) {
         let dmg = m.type === 'poison' ? 25 : 10;
+        // Se o player estiver com a Espada ativa, causa contra-ataque e reduz dano recebido
+        if (activeSlot === 4 && inventory.swordTier > 0) {
+          dmg = Math.floor(dmg * 0.4);
+          m.x -= (player.dir * 40); // Empurra a aranha para trás
+        }
         takeDamage(dmg);
       }
 
@@ -603,18 +776,6 @@
       let ty = player.y + 4 + Math.sin(waveTicks*0.15 + pet.offset)*2;
       if(Math.hypot(tx - pet.x, ty - pet.y) > 16) { pet.x += (tx - pet.x) * 0.12; pet.y += (ty - pet.y) * 0.12; }
     });
-
-    npcs.forEach(npc => {
-      if(currentMap !== 'surface' || villageLevel < npc.minLevel || currentInteractingNPC === npc) return;
-      npc.timer -= dt;
-      if(npc.timer <= 0) {
-        npc.timer = 5 + Math.random()*5;
-        npc.targetX = npc.startX + (Math.random()-0.5)*120; npc.targetY = npc.startY + (Math.random()-0.5)*120;
-      }
-      let ndx = npc.targetX - npc.x, ndy = npc.targetY - npc.y;
-      let ndist = Math.hypot(ndx, ndy);
-      if(ndist > 5) { npc.x += (ndx/ndist)*35*dt; npc.y += (ndy/ndist)*35*dt; }
-    });
   }
 
   function drawGame() {
@@ -631,30 +792,71 @@
       for(let y=startRow; y<endRow; y++){
         if(!currentGrid[x] || !currentGrid[x][y]) continue;
         const bx = x*TILE - camX; const by = y*TILE - camY;
-        ctx.fillStyle = COLORS[currentGrid[x][y].biome];
+        
+        let biomeColor = COLORS[currentGrid[x][y].biome];
+        // Mudança visual de acordo com a estação nas gramas
+        if (currentGrid[x][y].biome === BIOME.GRASS) {
+          if (currentStation === "Outono") biomeColor = "#b58231";
+          else if (currentStation === "Inverno") biomeColor = "#639a8a";
+          else if (currentStation === "Primavera") biomeColor = "#48bb78";
+        }
+
+        ctx.fillStyle = biomeColor;
         ctx.fillRect(bx, by, TILE, TILE);
       }
     }
 
+    // Desenhar Estruturas Especiais: Barco (Nível 5)
+    if (villageLevel >= 5 && currentMap === 'surface') {
+      const bx = (2.5*TILE) - camX, by = (Math.floor(WORLD/2)*TILE) - camY;
+      ctx.fillStyle = '#3e2723'; ctx.fillRect(bx-12, by-6, 32, 16);
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(bx+2, by-18, 4, 12); // Vela
+      ctx.fillStyle = '#ffaa00'; ctx.font = '9px sans-serif'; ctx.fillText("⛵ BARCO", bx-10, by-24);
+    }
+    if (currentMap === 'continent_2') {
+      const bx = ((WORLD-4)*TILE) - camX, by = (Math.floor(WORLD/2)*TILE) - camY;
+      ctx.fillStyle = '#3e2723'; ctx.fillRect(bx-12, by-6, 32, 16);
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(bx+2, by-18, 4, 12);
+    }
+
+    // Desenhar Heliponto (Fase de obra ou completo)
+    if (currentMap === 'surface') {
+      const hx = (4*TILE) - camX, hy = (Math.floor(WORLD/2 - 2)*TILE) - camY;
+      const isReady = (currentYear > 1 || currentMonth >= 5);
+      ctx.fillStyle = isReady ? '#374151' : '#78350f';
+      ctx.fillRect(hx-16, hy-16, 36, 36);
+      ctx.fillStyle = '#fff';
+      ctx.font = '10px sans-serif';
+      ctx.fillText(isReady ? "🚁 [H]" : "🚧 OBRA", hx-12, hy+6);
+    }
+    if (currentMap === 'city') {
+      const hx = ((WORLD/2)*TILE) - camX, hy = ((WORLD-5)*TILE) - camY;
+      ctx.fillStyle = '#374151'; ctx.fillRect(hx-16, hy-16, 36, 36);
+      ctx.fillStyle = '#fff'; ctx.font = '10px sans-serif'; ctx.fillText("🚁 ILHA", hx-12, hy+6);
+
+      // Desenhar Prédios e Lojas na Cidadezinha de forma simples
+      for(let i=-3; i<=3; i+=2) {
+        ctx.fillStyle = '#1e293b'; ctx.fillRect(((WORLD/2 + i)*TILE) - camX, (8*TILE) - camY, 40, 60); // Prédio
+        ctx.fillStyle = '#f59e0b'; ctx.fillRect(((WORLD/2 + i)*TILE + 10) - camX, (10*TILE) - camY, 20, 20); // Loja
+      }
+    }
+
+    // Portais básicos
     portals.forEach(p => {
       if(currentMap !== p.from) return;
       const px = p.x - camX, py = p.y - camY;
       ctx.fillStyle = '#475569'; ctx.fillRect(px-4, py-4, TILE+8, TILE+8);
       ctx.fillStyle = '#0f172a'; ctx.fillRect(px, py, TILE, TILE);
-      ctx.fillStyle = '#fbbf24'; ctx.font = '9px sans-serif'; ctx.fillText("PORTAL", px-2, py-8);
     });
 
-    if(currentMap === 'surface') {
+    if(currentMap === 'surface' && houseBuilt) {
       const hx = (startX - 3.5)*TILE - camX, hy = (startY - 3.5)*TILE - camY;
       ctx.fillStyle = '#d1fae5'; ctx.fillRect(hx, hy, 50, 40);
-      ctx.fillStyle = houseBuilt ? '#0f172a' : '#b45309'; ctx.fillRect(hx+18, hy+20, 14, 20); 
-      ctx.fillStyle = '#dc2626'; ctx.beginPath(); ctx.moveTo(hx-6, hy); ctx.lineTo(hx+25, hy-16); ctx.lineTo(hx+56, hy); ctx.closePath(); ctx.fill();
     }
 
     if(currentMap === craftingTable.map) {
       const cx = craftingTable.x - camX, cy = craftingTable.y - camY;
       ctx.fillStyle = '#5c3a21'; ctx.fillRect(cx - 12, cy - 12, 24, 24);
-      ctx.fillStyle = '#fff'; ctx.font = '9px sans-serif'; ctx.fillText("CRAFT", cx-13, cy+4);
     }
 
     resourceNodes.forEach(node => {
@@ -662,20 +864,20 @@
       const sx = node.x - camX, sy = node.y - camY;
       if(node.type === 'tree') {
         ctx.fillStyle = '#78350f'; ctx.fillRect(sx-3, sy-2, 6, 12);
-        ctx.fillStyle = '#15803d'; ctx.beginPath(); ctx.arc(sx, sy-6, node.size, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = currentStation === "Outono" ? "#ea580c" : '#15803d'; 
+        ctx.beginPath(); ctx.arc(sx, sy-6, node.size, 0, Math.PI*2); ctx.fill();
+      } else if (node.type === 'dirt_pile') {
+        ctx.fillStyle = '#92400e'; ctx.beginPath(); ctx.moveTo(sx-8, sy+6); ctx.lineTo(sx, sy-6); ctx.lineTo(sx+8, sy+6); ctx.closePath(); ctx.fill();
       } else {
         const oreColors = { copper:'#d97706', iron:'#94a3b8', ore:'#0891b2', diamond:'#22d3ee' };
         ctx.fillStyle = oreColors[node.type]; ctx.fillRect(sx-7, sy-7, 14, 14);
-        ctx.fillStyle = '#fff'; ctx.fillRect(sx-3, sy-3, 6, 6);
       }
     });
 
     npcs.forEach(npc => {
-      if(currentMap !== npc.map || villageLevel < npc.minLevel) return;
+      if(currentMap !== npc.map || villageLevel < npc.minLevel || currentInteractingNPC === npc) return;
       const nx = npc.x - camX, ny = npc.y - camY;
       ctx.fillStyle = npc.color; ctx.beginPath(); ctx.arc(nx, ny, 8, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#ffdbb5'; ctx.beginPath(); ctx.arc(nx, ny-3, 5, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#fff'; ctx.font = '9px sans-serif'; ctx.fillText(npc.name, nx-20, ny-12);
     });
 
     monsters.forEach(m => {
@@ -683,13 +885,6 @@
       const mx = m.x - camX, my = m.y - camY;
       ctx.fillStyle = m.type === 'poison' ? '#22c55e' : '#ef4444'; 
       ctx.beginPath(); ctx.arc(mx, my, 6, 0, Math.PI*2); ctx.fill();
-      ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(mx-10, my); ctx.lineTo(mx+10, my); ctx.moveTo(mx, my-10); ctx.lineTo(mx, my+10); ctx.stroke();
-    });
-
-    followedPets.forEach(pet => {
-      const px = pet.x - camX, py = pet.y - camY;
-      ctx.fillStyle = pet.isDog ? '#b45309' : '#e2e8f0'; ctx.fillRect(px - 5, py - 4, 10, 7);
     });
 
     const sx = player.x - camX, sy = player.y - camY;
@@ -698,17 +893,25 @@
     } else {
       ctx.fillStyle = '#1d4ed8'; ctx.beginPath(); ctx.arc(sx, sy+1, 8, 0, Math.PI*2); ctx.fill();
       ctx.fillStyle = '#ffdbb5'; ctx.beginPath(); ctx.arc(sx, sy-4, 5, 0, Math.PI*2); ctx.fill();
-      if(hasArmor) { 
-        ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 3; ctx.stroke();
-      }
     }
 
-    if(graphicLevel === 3 || currentMap === 'mine_3') {
-      ctx.fillStyle = 'rgba(5, 5, 10, 0.6)'; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-      let grad = ctx.createRadialGradient(sx, sy, 2, sx, sy, 80);
+    // Efeitos Climáticos na Tela (Chuva/Sereno)
+    if (currentWeather === "Chuva") {
+      ctx.fillStyle = "rgba(174,196,243,0.22)";
+      for(let i=0; i<6; i++) {
+        ctx.fillRect(Math.random()*VIEW_W, Math.random()*VIEW_H, 2, 14);
+      }
+    } else if (currentWeather === "Sereno") {
+      ctx.fillStyle = "rgba(255,255,255,0.12)";
+      ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    }
+
+    if(graphicLevel === 3) {
+      ctx.fillStyle = 'rgba(5, 5, 10, 0.4)'; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+      let grad = ctx.createRadialGradient(sx, sy, 2, sx, sy, 90);
       grad.addColorStop(0, 'rgba(255,255,255,0.9)'); grad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = grad;
-      ctx.beginPath(); ctx.arc(sx, sy, 80, 0, Math.PI*2); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
+      ctx.beginPath(); ctx.arc(sx, sy, 90, 0, Math.PI*2); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
     }
   }
 
