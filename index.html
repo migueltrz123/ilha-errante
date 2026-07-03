@@ -2,72 +2,71 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Ilha Errante - Edição Continentes e Estações</title>
+<title>Ilha Errante - Ultra Graphics Edition</title>
 <style>
   :root{
-    --bg:#0a0a0f;
-    --mc-gui:#c6c6c6;
-    --mc-border-dark:#555555;
-    --mc-border-light:#ffffff;
-    --mc-slot:rgba(30,30,35,0.85);
+    --bg: #030305;
+    --mc-gui: #d2d2d6;
+    --mc-border-dark: #3a3a3e;
+    --mc-border-light: #ffffff;
+    --mc-slot: rgba(15, 15, 20, 0.9);
   }
   *{box-sizing:border-box; user-select: none;}
-  html,body{margin:0;padding:0;background:var(--bg);font-family:sans-serif;font-weight:bold;color:#fff;overflow:hidden;height:100%;}
+  html,body{margin:0;padding:0;background:var(--bg);font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;font-weight:bold;color:#fff;overflow:hidden;height:100%;}
   #wrap{display:flex;flex-direction:column;align-items:center;padding:10px;gap:8px;min-height:100%;position:relative;}
-  h1{margin:0;font-size:24px;color:#fff;text-shadow:3px 3px #000;letter-spacing:2px;}
-  #stage{position:relative;border:4px solid #3a3a42;background:#1b4965;box-shadow:0 20px 50px rgba(0,0,0,0.9);border-radius:4px;}
-  canvas#game{display:block;}
+  h1{margin:0;font-size:26px;color:#fff;text-shadow:0 0 10px rgba(255,255,255,0.2), 3px 3px #000;letter-spacing:3px;font-weight:900;}
+  #stage{position:relative;border:4px solid #1e1e24;background:#111;box-shadow:0 30px 70px rgba(0,0,0,1);border-radius:8px;overflow:hidden;}
+  canvas#game{display:block;image-rendering: auto;}
   
-  .menu-screen {position:absolute;top:0;left:0;width:100%;height:100%;background:#111116;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;z-index:200;}
-  .menu-title {font-size:32px;color:#ffaa00;text-shadow:4px 4px #000;margin-bottom:20px;}
-  .menu-btn {width:200px;background:#555;border:3px solid #222;border-top-color:#fff;border-left-color:#fff;color:#fff;padding:10px;cursor:pointer;font-family:inherit;font-size:16px;text-align:center;}
-  .menu-btn:hover {background:#777;}
+  .menu-screen {position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle, #1a1c29 0%, #0a0b10 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;z-index:200;}
+  .menu-title {font-size:38px;color:#ffaa00;text-shadow:0 0 20px rgba(255,170,0,0.4), 4px 4px #000;margin-bottom:20px;font-weight:900;letter-spacing:4px;}
+  .menu-btn {width:220px;background:#2a2b36;border:2px solid #3e4054;border-radius:6px;color:#fff;padding:12px;cursor:pointer;font-family:inherit;font-size:16px;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,0.4);transition:all 0.2s;}
+  .menu-btn:hover {background:#3e4054;border-color:#ffaa00;box-shadow:0 0 15px rgba(255,170,0,0.3);transform:translateY(-2px);}
   
   .config-row {display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff;}
   .slider {width:220px;cursor:pointer;}
 
-  #hotbar{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;background:#2d2d35;border:4px solid #5a5a65;padding:4px;gap:6px;box-shadow:0 8px 0 #000;border-radius:4px;z-index:10;}
-  .hot-slot{width:56px;height:56px;background:var(--mc-slot);border:3px solid #1a1a1f;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;font-size:11px;border-radius:2px;}
-  .hot-slot.active{border-color:#ffffff;box-shadow:inset 0 0 10px rgba(255,255,255,1);background:rgba(200,200,220,0.4);border-width:4px;}
-  .hot-slot .count{position:absolute;bottom:4px;right:6px;font-size:12px;color:#fff;text-shadow:1.5px 1.5px #000;}
-  .hot-slot .key-hint{position:absolute;top:2px;left:4px;font-size:9px;color:#bbb;}
+  #hotbar{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;background:rgba(20,21,28,0.95);border:2px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px);padding:6px;gap:8px;box-shadow:0 15px 35px rgba(0,0,0,0.8);border-radius:12px;z-index:10;}
+  .hot-slot{width:58px;height:58px;background:var(--mc-slot);border:2px solid #2d2f3f;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;font-size:11px;border-radius:8px;transition:all 0.15s;}
+  .hot-slot.active{border-color:#ffaa00;box-shadow:0 0 15px rgba(255,170,0,0.5);background:rgba(255,170,0,0.15);transform:scale(1.05);}
+  .hot-slot .count{position:absolute;bottom:4px;right:6px;font-size:12px;color:#ffaa00;text-shadow:1px 1px #000;}
+  .hot-slot .key-hint{position:absolute;top:3px;left:5px;font-size:9px;color:#6b7280;}
 
-  #inventoryScreen{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);width:340px;background:var(--mc-gui);border:4px solid var(--mc-border-dark);border-top-color:var(--mc-border-light);border-left-color:var(--mc-border-light);padding:14px;display:none;flex-direction:column;gap:10px;box-shadow:0 12px 30px rgba(0,0,0,0.7);z-index:100;color:#333;}
-  .inv-title{font-size:14px;margin:0;color:#333;text-transform:uppercase;border-bottom:2px solid #8b8b8b;padding-bottom:4px;}
+  #inventoryScreen{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);width:360px;background:var(--mc-gui);border:3px solid var(--mc-border-dark);border-radius:12px;padding:16px;display:none;flex-direction:column;gap:12px;box-shadow:0 25px 60px rgba(0,0,0,0.8);z-index:100;color:#1e293b;}
+  .inv-title{font-size:16px;margin:0;color:#0f172a;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #cbd5e1;padding-bottom:6px;}
   
-  #craftTableScreen{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);width:480px;background:#b2b2b2;border:4px solid #4a2711;padding:14px;display:none;flex-direction:column;gap:10px;box-shadow:0 12px 30px rgba(0,0,0,0.8);z-index:110;color:#111;}
+  #craftTableScreen{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);width:490px;background:#cbd5e1;border:3px solid #475569;border-radius:12px;padding:16px;display:none;flex-direction:column;gap:12px;box-shadow:0 25px 60px rgba(0,0,0,0.8);z-index:110;color:#0f172a;}
   .craft-container{display:flex;gap:20px;justify-content:center;align-items:center;}
   .craft-grid-3x3{display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;}
-  .craft-input-slot{width:54px;height:54px;background:#444;border:3px solid #222;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;box-shadow:inset 0 0 5px #000;cursor:pointer;}
-  .craft-materials{display:flex;flex-direction:column;gap:6px;background:#999;padding:10px;border:3px dashed #666;max-height:200px;overflow-y:auto;}
-  .drag-item{width:50px;height:40px;background:#555;border:2px solid #222;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:grab;position:relative;color:#fff;}
-  .drag-item .mat-count{position:absolute;bottom:2px;right:4px;font-size:10px;color:#fff;text-shadow:1px 1px #000;}
+  .craft-input-slot{width:56px;height:56px;background:#1e293b;border:2px solid #475569;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;box-shadow:inset 0 4px 10px rgba(0,0,0,0.5);cursor:pointer;transition:background 0.2s;}
+  .craft-input-slot:hover {background:#334155;}
+  .craft-materials{display:flex;flex-direction:column;gap:6px;background:#94a3b8;padding:10px;border-radius:8px;max-height:200px;overflow-y:auto;box-shadow:inset 0 2px 5px rgba(0,0,0,0.2);}
+  .drag-item{width:54px;height:44px;background:#334155;border:2px solid #1e293b;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:grab;position:relative;color:#fff;}
   
-  .mc-btn{background:#7a7a7a;border:3px solid #555;border-top-color:#fff;border-left-color:#fff;color:#fff;padding:6px 12px;cursor:pointer;font-size:11px;font-weight:bold;text-transform:uppercase;}
-  .mc-btn.danger{background:#a93226;}
+  .mc-btn{background:#475569;border:none;border-radius:6px;color:#fff;padding:8px 14px;cursor:pointer;font-size:11px;font-weight:bold;text-transform:uppercase;transition:all 0.2s;}
+  .mc-btn:hover{background:#334155;}
+  .mc-btn.danger{background:#ef4444;}
+  .mc-btn.danger:hover{background:#dc2626;}
   .storage-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;}
-  .inv-slot{width:138px;height:45px;background:#8b8b8b;border:3px solid #373737;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;font-size:12px;}
+  .inv-slot{width:145px;height:45px;background:#f1f5f9;border:2px solid #cbd5e1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;font-size:12px;color:#334155;}
 
-  #instructions{position:absolute;top:12px;left:12px;font-size:11px;background:rgba(10,10,15,0.9);border:2px solid #444;border-radius:6px;padding:10px 14px;line-height:1.6;pointer-events:none;z-index:10;}
+  #instructions{position:absolute;top:14px;left:14px;font-size:11px;background:rgba(10,11,18,0.85);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(5px);border-radius:8px;padding:12px 16px;line-height:1.7;pointer-events:none;z-index:10;box-shadow:0 4px 15px rgba(0,0,0,0.3);}
   
-  #dialog{position:absolute;left:50%;bottom:95px;transform:translateX(-50%);width:90%;max-width:520px;background:rgba(15,15,22,0.98);border:3px solid #555;border-radius:4px;padding:14px;display:none;z-index:150;}
-  .dialog-options{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;border-top:1px solid #444;padding-top:8px;}
-  .opt-btn{background:#444;border:2px solid #222;color:#ffaa00;padding:6px 10px;font-size:11px;cursor:pointer;font-weight:bold;}
-  .opt-btn:hover{background:#666;color:#fff;}
+  #dialog{position:absolute;left:50%;bottom:100px;transform:translateX(-50%);width:92%;max-width:540px;background:rgba(10,11,18,0.96);border:2px solid rgba(255,255,255,0.15);backdrop-filter:blur(8px);border-radius:10px;padding:16px;display:none;z-index:150;box-shadow:0 15px 40px rgba(0,0,0,0.6);}
+  .dialog-options{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;border-top:1px solid rgba(255,255,255,0.1);padding-top:10px;}
+  .opt-btn{background:#27273a;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#ffaa00;padding:8px 12px;font-size:11px;cursor:pointer;font-weight:bold;transition:all 0.15s;}
+  .opt-btn:hover{background:#ffaa00;color:#000;box-shadow:0 0 10px rgba(255,170,0,0.4);}
 
-  #uiTopRight{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:10;align-items:flex-end;}
-  #villageRank{font-size:12px;background:rgba(40,30,15,0.9);border:2px solid #ffaa00;border-radius:6px;padding:6px 12px;color:#ffaa00;box-shadow:0 4px 10px rgba(0,0,0,0.5);}
-  #healthBarContainer{width:160px;height:20px;background:#441111;border:2px solid #fff;border-radius:4px;position:relative;overflow:hidden;}
-  #healthBarFill{width:100%;height:100%;background:#cc2222;transition:width 0.2s;}
-  #healthText{position:absolute;width:100%;text-align:center;font-size:11px;line-height:16px;color:#fff;text-shadow:1px 1px #000;}
+  #uiTopRight{position:absolute;top:14px;right:14px;display:flex;flex-direction:column;gap:8px;z-index:10;align-items:flex-end;}
+  #villageRank{font-size:12px;background:rgba(20,15,10,0.9);border:1.5px solid #ffaa00;border-radius:8px;padding:6px 14px;color:#ffaa00;box-shadow:0 4px 15px rgba(0,0,0,0.4);font-weight:800;}
+  #healthBarContainer{width:160px;height:18px;background:#311;border:1.5px solid rgba(255,255,255,0.2);border-radius:20px;position:relative;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,0.3);}
+  #healthBarFill{width:100%;height:100%;background:linear-gradient(90deg, #ef4444 0%, #b91c1c 100%);transition:width 0.2s;}
+  #healthText{position:absolute;width:100%;text-align:center;font-size:10px;line-height:15px;color:#fff;text-shadow:1px 1px #000;font-weight:800;}
 
-  /* Calendário e Clima */
-  #calendarWidget{background:rgba(20,20,30,0.85);border:2px solid #555;border-radius:6px;padding:6px 10px;font-size:11px;color:#00ffcc;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,0.4);text-align:right;}
-  #calendarWidget:hover{background:rgba(35,35,50,0.95);border-color:#00ffcc;}
-  #weatherDisplay{font-size:11px;color:#fff;text-shadow:1px 1px #000;}
+  #calendarWidget{background:rgba(15,23,42,0.85);border:1px solid rgba(0,255,204,0.3);backdrop-filter:blur(5px);border-radius:8px;padding:6px 12px;font-size:11px;color:#00ffcc;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.3);text-align:right;}
+  #calendarWidget:hover{border-color:#00ffcc;box-shadow:0 0 10px rgba(0,255,204,0.3);}
 
-  /* Efeito de Cutscene */
-  #cutsceneOverlay{position:absolute;top:0;left:0;width:100%;height:100%;background:#000;display:none;align-items:center;justify-content:center;font-size:24px;color:#fff;z-index:300;text-shadow:2px 2px #555;letter-spacing:1px;animation:fadeInOut 4s forwards;}
+  #cutsceneOverlay{position:absolute;top:0;left:0;width:100%;height:100%;background:#000;display:none;align-items:center;justify-content:center;font-size:24px;color:#fff;z-index:300;text-shadow:0 0 10px rgba(255,255,255,0.5);letter-spacing:2px;animation:fadeInOut 4s forwards;}
   @keyframes fadeInOut {
     0% {opacity:0;} 15% {opacity:1;} 85% {opacity:1;} 100% {opacity:0;}
   }
@@ -81,7 +80,7 @@
     
     <div id="uiTopRight">
       <div id="calendarWidget" onclick="showCalendarDetails()">📅 Dia <span id="calDay">1</span> (<span id="calWeather">☀️ Sol</span>)</div>
-      <div id="villageRank">🏡 Nível da Vila: <span id="vLevel">1</span> (<span id="vPoints">0</span>/5)</div>
+      <div id="villageRank">🏡 Vila Nv: <span id="vLevel">1</span> (<span id="vPoints">0</span>/5)</div>
       <div id="healthBarContainer">
         <div id="healthBarFill"></div>
         <div id="healthText">HP: 100/100</div>
@@ -97,55 +96,55 @@
     </div>
 
     <div id="configMenu" class="menu-screen" style="display:none;">
-      <div class="menu-title">⚙️ CONFIGURAÇÕES</div>
+      <div class="menu-title">⚙️ CONFIGURAÇÕES VISUAIS</div>
       <div class="config-row">
-        <label id="graphicLabel" style="font-size:18px; color:#ffaa00;">Qualidade Visual: Bonito (Médio)</label>
-        <input type="range" id="graphicSlider" min="1" max="3" value="2" class="slider" oninput="changeGraphics(this.value)">
+        <label id="graphicLabel" style="font-size:18px; color:#ffaa00;">Qualidade Visual: Ostentação (Máximo)</label>
+        <input type="range" id="graphicSlider" min="1" max="3" value="3" class="slider" oninput="changeGraphics(this.value)">
       </div>
       <button class="menu-btn" onclick="closeConfig()" style="margin-top:20px;">VOLTAR</button>
     </div>
 
     <div id="instructions">
-      <span style="color:#ffaa00; font-size:12px;">🎮 COMANDOS:</span><br>
+      <span style="color:#ffaa00; font-size:12px; font-weight:900;">🎮 COMANDOS:</span><br>
       • Mover: <kbd>WASD</kbd> / Setas<br>
-      • Ações / Portais / Barco: <kbd>E</kbd><br>
-      • Recursos: <kbd>I</kbd><br>
-      • Slots: <kbd>1</kbd> a <kbd>6</kbd><br>
-      • <span style="color:#ff5555;">Teleporte: <kbd>R</kbd></span>
+      • Ações / Barco / Heliponto: <kbd>E</kbd><br>
+      • Inventário: <kbd>I</kbd><br>
+      • Ferramentas: <kbd>1</kbd> a <kbd>6</kbd><br>
+      • <span style="color:#ff5555;">Respawn Seguro: <kbd>R</kbd></span>
     </div>
 
     <div id="dialog">
-      <div id="dName" style="color:#ffaa00; font-size:14px; text-transform:uppercase;">NPC</div>
-      <div id="dText" style="color:#eee; font-size:13px; margin-top:5px; min-height:30px;">...</div>
+      <div id="dName" style="color:#ffaa00; font-size:14px; text-transform:uppercase; font-weight:900;">NPC</div>
+      <div id="dText" style="color:#eee; font-size:13px; margin-top:5px; min-height:30px; font-weight:500;">...</div>
       <div class="dialog-options" id="dOpts"></div>
     </div>
 
     <div id="inventoryScreen">
-      <div class="inv-title">Seus Recursos</div>
+      <div class="inv-title">Recursos Coletados</div>
       <div class="storage-grid" style="margin:10px 0;">
-        <div class="inv-slot">Madeira<span id="inv-wood">0</span></div>
-        <div class="inv-slot">Cobre<span id="inv-copper">0</span></div>
-        <div class="inv-slot">Ferro<span id="inv-iron">0</span></div>
-        <div class="inv-slot">Cristal<span id="inv-ore">0</span></div>
-        <div class="inv-slot">Diamante<span id="inv-diamond">0</span></div>
-        <div class="inv-slot">Itens Estação<span id="inv-season">0</span></div>
-        <div class="inv-slot">Ferramenta<span id="inv-tool">Mão</span></div>
-        <div class="inv-slot">Armadura<span id="inv-armor">Nenhuma</span></div>
+        <div class="inv-slot">Madeira<span id="inv-wood" style="font-weight:900;color:#000;">0</span></div>
+        <div class="inv-slot">Cobre<span id="inv-copper" style="font-weight:900;color:#000;">0</span></div>
+        <div class="inv-slot">Ferro<span id="inv-iron" style="font-weight:900;color:#000;">0</span></div>
+        <div class="inv-slot">Cristal<span id="inv-ore" style="font-weight:900;color:#000;">0</span></div>
+        <div class="inv-slot">Diamante<span id="inv-diamond" style="font-weight:900;color:#000;">0</span></div>
+        <div class="inv-slot">Itens Estação<span id="inv-season" style="font-weight:900;color:#000;">0</span></div>
+        <div class="inv-slot">Equipado<span id="inv-tool" style="font-weight:900;color:#1e3a8a;">Mão</span></div>
+        <div class="inv-slot">Defesa<span id="inv-armor" style="font-weight:900;color:#16a34a;">Nenhuma</span></div>
       </div>
       <button class="mc-btn danger" onclick="toggleInventory()">Fechar [I]</button>
     </div>
 
     <div id="craftTableScreen">
-      <div style="font-size:13px;text-align:center;text-transform:uppercase;border-bottom:2px solid #555;padding-bottom:4px;font-weight:bold;">🛠️ Bancada de Trabalho</div>
+      <div style="font-size:14px;text-align:center;text-transform:uppercase;border-bottom:2px solid #94a3b8;padding-bottom:6px;font-weight:900;color:#0f172a;">🛠️ Mesa de Metalurgia Avançada</div>
       <div class="craft-container">
         <div class="craft-materials">
-          <div class="drag-item" id="drag-wood" draggable="true" ondragstart="drag(event)">Mad.<span class="mat-count" id="count-drag-wood">0</span></div>
-          <div class="drag-item" id="drag-copper" draggable="true" ondragstart="drag(event)">Cob.<span class="mat-count" id="count-drag-copper">0</span></div>
-          <div class="drag-item" id="drag-iron" draggable="true" ondragstart="drag(event)">Fer.<span class="mat-count" id="count-drag-iron">0</span></div>
-          <div class="drag-item" id="drag-ore" draggable="true" ondragstart="drag(event)">Cris.<span class="mat-count" id="count-drag-ore">0</span></div>
-          <div class="drag-item" id="drag-diamond" draggable="true" ondragstart="drag(event)">Dia.<span class="mat-count" id="count-drag-diamond">0</span></div>
+          <div class="drag-item" id="drag-wood" draggable="true" ondragstart="drag(event)">Mad.<span class="mat-count" id="count-drag-wood" style="position:absolute;bottom:2px;right:4px;">0</span></div>
+          <div class="drag-item" id="drag-copper" draggable="true" ondragstart="drag(event)">Cob.<span class="mat-count" id="count-drag-copper" style="position:absolute;bottom:2px;right:4px;">0</span></div>
+          <div class="drag-item" id="drag-iron" draggable="true" ondragstart="drag(event)">Fer.<span class="mat-count" id="count-drag-iron" style="position:absolute;bottom:2px;right:4px;">0</span></div>
+          <div class="drag-item" id="drag-ore" draggable="true" ondragstart="drag(event)">Cris.<span class="mat-count" id="count-drag-ore" style="position:absolute;bottom:2px;right:4px;">0</span></div>
+          <div class="drag-item" id="drag-diamond" draggable="true" ondragstart="drag(event)">Dia.<span class="mat-count" id="count-drag-diamond" style="position:absolute;bottom:2px;right:4px;">0</span></div>
         </div>
-        <div style="font-size:24px;">➡️</div>
+        <div style="font-size:24px;color:#475569;">➔</div>
         <div class="craft-grid-3x3">
           <div class="craft-input-slot" id="c-grid-0" ondrop="drop(event, 0)" ondragover="allowDrop(event)" onclick="removeIngredient(0)"></div>
           <div class="craft-input-slot" id="c-grid-1" ondrop="drop(event, 1)" ondragover="allowDrop(event)" onclick="removeIngredient(1)"></div>
@@ -158,16 +157,16 @@
           <div class="craft-input-slot" id="c-grid-8" ondrop="drop(event, 8)" ondragover="allowDrop(event)" onclick="removeIngredient(8)"></div>
         </div>
       </div>
-      <div class="craft-actions" style="margin-top:10px;border-top:1px solid #777;padding-top:10px;">
+      <div class="craft-actions" style="margin-top:10px;border-top:1px solid #cbd5e1;padding-top:10px;display:flex;justify-content:flex-end;gap:6px;">
         <button class="mc-btn danger" onclick="clearCraftingGrid()">Limpar</button>
-        <button class="mc-btn" style="background:#2e7d32;" onclick="craftItem3x3()">🔨 Combinar!</button>
-        <button class="mc-btn" style="background:#555;" onclick="closeCraftTable()">Sair</button>
+        <button class="mc-btn" style="background:#16a34a;" onclick="craftItem3x3()">🔨 Forjar</button>
+        <button class="mc-btn" style="background:#64748b;" onclick="closeCraftTable()">Fechar</button>
       </div>
     </div>
 
     <div id="hotbar">
       <div class="hot-slot active" id="slot-0"><span class="key-hint">1</span>Mão</div>
-      <div class="hot-slot" id="slot-1"><span class="key-hint">2</span><span>Machado</span></div>
+      <div class="hot-slot" id="slot-1"><span class="key-hint">2</span>Machado</div>
       <div class="hot-slot" id="slot-2"><span class="key-hint">3</span><span id="icon-pick">🔒 Pic.</span></div>
       <div class="hot-slot" id="slot-3"><span class="key-hint">4</span><span id="icon-shovel">🔒 Pá</span></div>
       <div class="hot-slot" id="slot-4"><span class="key-hint">5</span><span id="icon-sword">🔒 Esp.</span></div>
@@ -183,7 +182,7 @@
   const TILE = 32;
   const WORLD = 35; 
   let gameRunning = false;
-  let graphicLevel = 2; 
+  let graphicLevel = 3; 
   let animationId = null;
   let waveTicks = 0;
 
@@ -191,7 +190,6 @@
   let villageLevel = 1;
   let boatSpawnedAlertTriggered = false;
 
-  // Sistema de Calendário e Clima
   let gameTime = 0; 
   let currentDay = 1;
   let currentMonth = 1;
@@ -201,17 +199,16 @@
   const WEATHERS = ["Sol", "Chuva", "Nublado", "Sereno"];
   let currentWeather = "Sol";
 
-  // Sistema de Vida e Combate
   let playerHP = 100;
   let hasArmor = false;
   let hitCooldown = 0;
 
-  // Mapas e Continentes
-  let currentMap = "surface"; // surface, house_interior, mine_1, mine_2, mine_3, continent_2, city
+  let currentMap = "surface"; 
   let houseBuilt = false;
 
   const BIOME = { WATER:'water', GRASS:'grass', MOUNTAIN:'mountain', MINE_FLOOR:'mine_floor', WALL:'wall', HOUSE_FLOOR:'house_floor', SAND:'sand', SNOW:'snow', CITY_FLOOR:'city_floor' };
-  const COLORS = { water:'#1b4965', grass:'#2a9d8f', mountain:'#4a4e69', mine_floor:'#2b2b2b', wall:'#151515', house_floor:'#78350f', sand:'#e9c46a', snow:'#e2e8f0', city_floor:'#475569' };
+  
+  const COLORS = { water:'#133a52', grass:'#1f7a60', mountain:'#3c3f54', mine_floor:'#1e1e24', wall:'#0d0d12', house_floor:'#5c2509', sand:'#dfb755', snow:'#e6ebf2', city_floor:'#334155' };
   const BLOCKING = new Set([BIOME.WATER, BIOME.MOUNTAIN, BIOME.WALL]);
 
   let speedMultiplierWalk = 1.0;
@@ -229,21 +226,27 @@
   let resourceNodes = [];
   const monsters = [];
   const followedPets = [];
+  
+  const particles = [];
+  function spawnLeafParticles(x, y, color) {
+    if(graphicLevel < 2) return;
+    for(let i=0; i<3; i++) {
+      particles.push({
+        x: x, y: y,
+        vx: (Math.random() - 0.5) * 15, vy: Math.random() * 10 + 5,
+        life: 1.0, color: color, size: Math.random() * 3 + 2
+      });
+    }
+  }
 
   let startX = Math.floor(WORLD / 2);
   let startY = Math.floor(WORLD / 2);
   
   const maps = {
-    surface: new Array(WORLD),
-    house_interior: new Array(WORLD),
-    mine_1: new Array(WORLD),
-    mine_2: new Array(WORLD),
-    mine_3: new Array(WORLD),
-    continent_2: new Array(WORLD),
-    city: new Array(WORLD)
+    surface: new Array(WORLD), house_interior: new Array(WORLD), mine_1: new Array(WORLD),
+    mine_2: new Array(WORLD), mine_3: new Array(WORLD), continent_2: new Array(WORLD), city: new Array(WORLD)
   };
 
-  // Inicializar mapa da Superfície Básica
   function initSurfaceMap(mapName, customBiomeGenerator) {
     resourceNodes = resourceNodes.filter(n => n.map !== mapName);
     for(let x=0; x<WORLD; x++){
@@ -255,16 +258,11 @@
         if (customBiomeGenerator && !isEdge) {
           biome = customBiomeGenerator(x, y, biome);
         }
-
         maps[mapName][x][y] = { biome: biome, seed: Math.random() };
 
         if(!isEdge && biome !== BIOME.WATER && biome !== BIOME.MOUNTAIN) {
-          if (Math.random() > 0.93) {
-            resourceNodes.push({ map: mapName, type: 'tree', x: (x+0.5)*TILE, y: (y+0.5)*TILE, hp: 3, size: 12 });
-          }
-          if (Math.random() > 0.96) {
-            resourceNodes.push({ map: mapName, type: 'dirt_pile', x: (x+0.5)*TILE, y: (y+0.5)*TILE, hp: 1 });
-          }
+          if (Math.random() > 0.92) resourceNodes.push({ map: mapName, type: 'tree', x: (x+0.5)*TILE, y: (y+0.5)*TILE, hp: 3, size: 13 });
+          if (Math.random() > 0.96) resourceNodes.push({ map: mapName, type: 'dirt_pile', x: (x+0.5)*TILE, y: (y+0.5)*TILE, hp: 1 });
         }
         if(!isEdge && biome === BIOME.MOUNTAIN && Math.random() > 0.85) {
           resourceNodes.push({ map: mapName, type: 'copper', x: (x+0.5)*TILE, y: (y+0.5)*TILE, hp: 3 });
@@ -275,7 +273,6 @@
 
   initSurfaceMap('surface', null);
 
-  // Inicializar Minas e Interiores
   const initSimpleMap = (mapName, floorBiome, wallBiome) => {
     for(let x=0; x<WORLD; x++){
       maps[mapName][x] = new Array(WORLD);
@@ -290,7 +287,6 @@
   initSimpleMap('mine_2', BIOME.MINE_FLOOR, BIOME.MOUNTAIN);
   initSimpleMap('mine_3', BIOME.MINE_FLOOR, BIOME.MOUNTAIN);
 
-  // Inicializar Cidadezinha
   for(let x=0; x<WORLD; x++){
     maps.city[x] = new Array(WORLD);
     for(let y=0; y<WORLD; y++){
@@ -299,19 +295,15 @@
     }
   }
 
-  // Gerar Minérios Específicos e Monstros nas Minas
   const seedMine = (mapName, oreType, spiderType, count) => {
     for(let i=0; i<count; i++) {
       let rx = 6 + Math.floor(Math.random()*(WORLD-12));
       let ry = 6 + Math.floor(Math.random()*(WORLD-12));
       resourceNodes.push({ map: mapName, type: oreType, x: (rx+0.5)*TILE, y: (ry+0.5)*TILE, hp: 3 });
-      
       if(spiderType) {
         monsters.push({
-          map: mapName, type: spiderType,
-          x: (rx+1.5)*TILE, y: (ry+0.5)*TILE,
-          startX: (rx+1.5)*TILE, startY: (ry+0.5)*TILE,
-          targetX: (rx+1.5)*TILE, targetY: (ry+0.5)*TILE,
+          map: mapName, type: spiderType, x: (rx+1.5)*TILE, y: (ry+0.5)*TILE,
+          startX: (rx+1.5)*TILE, startY: (ry+0.5)*TILE, targetX: (rx+1.5)*TILE, targetY: (ry+0.5)*TILE,
           timer: 0, speed: spiderType === 'poison' ? 55 : 40
         });
       }
@@ -321,7 +313,6 @@
   seedMine('mine_2', 'ore', 'normal', 15); 
   seedMine('mine_3', 'diamond', 'poison', 12); 
 
-  // Forçar área de segurança ao redor do spawn na ilha principal
   for(let i=-5; i<=5; i++){
     for(let j=-5; j<=5; j++) maps.surface[startX+i][startY+j].biome = BIOME.GRASS;
   }
@@ -329,25 +320,25 @@
   const player = { x:(startX+0.5)*TILE, y:(startY+0.5)*TILE, dir:1, speed:145 };
   let craftingTable = { map: 'surface', x:(startX + 1.2)*TILE, y:(startY - 0.2)*TILE };
 
-  // Portais e Escadas fixas
   const portals = [
-    { from: 'surface', to: 'mine_1', x: (startX - 5)*TILE, y: (startY - 5)*TILE, label: "Entrar na Mina (Andar 1)" },
-    { from: 'mine_1', to: 'surface', x: (startX - 5)*TILE, y: (startY - 5)*TILE, label: "Subir para Superfície" },
-    { from: 'mine_1', to: 'mine_2', x: (startX + 5)*TILE, y: (startX + 5)*TILE, label: "Descer para Andar 2" },
-    { from: 'mine_2', to: 'mine_1', x: (startX + 5)*TILE, y: (startX + 5)*TILE, label: "Subir para Andar 1" },
-    { from: 'mine_2', to: 'mine_3', x: (startX - 5)*TILE, y: (startX + 5)*TILE, label: "Descer para Andar 3 (PERIGO)" },
-    { from: 'mine_3', to: 'mine_2', x: (startX - 5)*TILE, y: (startX + 5)*TILE, label: "Subir para Andar 2" },
-    { from: 'surface', to: 'house_interior', x: (startX - 3.5)*TILE, y: (startY - 2.5)*TILE, label: "Entrar em Casa", requiresHouse: true },
-    { from: 'house_interior', to: 'surface', x: (startX)*TILE, y: (WORLD - 6)*TILE, label: "Sair de Casa" }
+    { from: 'surface', to: 'mine_1', x: (startX - 5)*TILE, y: (startY - 5)*TILE },
+    { from: 'mine_1', to: 'surface', x: (startX - 5)*TILE, y: (startY - 5)*TILE },
+    { from: 'mine_1', to: 'mine_2', x: (startX + 5)*TILE, y: (startX + 5)*TILE },
+    { from: 'mine_2', to: 'mine_1', x: (startX + 5)*TILE, y: (startX + 5)*TILE },
+    { from: 'mine_2', to: 'mine_3', x: (startX - 5)*TILE, y: (startX + 5)*TILE },
+    { from: 'mine_3', to: 'mine_2', x: (startX - 5)*TILE, y: (startX + 5)*TILE },
+    { from: 'surface', to: 'house_interior', x: (startX - 3.5)*TILE, y: (startY - 2.5)*TILE, requiresHouse: true },
+    { from: 'house_interior', to: 'surface', x: (startX)*TILE, y: (WORLD - 6)*TILE }
   ];
 
+  // Cores de roupas e estilos específicos para os NPCs ficarem mais ricos visualmente
   const npcs = [
-    { id: 'mercador', name: 'MERCADOR', color: '#4f46e5', minLevel: 1, map: 'surface', x:(startX-1.5)*TILE, y:(startY-1.5)*TILE, startX:(startX-1.5)*TILE, startY:(startY-1.5)*TILE, targetX:(startX-1.5)*TILE, targetY:(startY-1.5)*TILE, timer:0 },
-    { id: 'domador', name: 'DOMADOR', color: '#16a34a', minLevel: 1, map: 'surface', x:(startX+1.5)*TILE, y:(startY+1.5)*TILE, startX:(startX+1.5)*TILE, startY:(startY+1.5)*TILE, targetX:(startX+1.5)*TILE, targetY:(startY+1.5)*TILE, timer:0 },
-    { id: 'alquimista', name: 'ALQUIMISTA', color: '#a855f7', minLevel: 2, map: 'surface', x:(startX-3.0)*TILE, y:(startY+2.0)*TILE, startX:(startX-3.0)*TILE, startY:(startY+2.0)*TILE, targetX:(startX-3.0)*TILE, targetY:(startY+2.0)*TILE, timer:0 },
-    { id: 'engenheiro', name: 'ENGENHEIRO', color: '#ea580c', minLevel: 3, map: 'surface', x:(startX+3.0)*TILE, y:(startY-2.5)*TILE, startX:(startX+3.0)*TILE, startY:(startY-2.5)*TILE, targetX:(startX+3.0)*TILE, targetY:(startY-2.5)*TILE, timer:0 },
-    { id: 'pedreiro', name: 'PEDREIRO', color: '#64748b', minLevel: 4, map: 'surface', x:(startX-4.0)*TILE, y:(startY-1.0)*TILE, startX:(startX-4.0)*TILE, startY:(startY-1.0)*TILE, targetX:(startX-4.0)*TILE, targetY:(startY-1.0)*TILE, timer:0 },
-    { id: 'armador', name: 'ARMADOR', color: '#06b6d4', minLevel: 5, map: 'surface', x:(startX+4.0)*TILE, y:(startY+0.5)*TILE, startX:(startX+4.0)*TILE, startY:(startY+0.5)*TILE, targetX:(startX+4.0)*TILE, targetY:(startY+0.5)*TILE, timer:0 }
+    { id: 'mercador', name: 'MERCADOR', color: '#6366f1', cloth: '#4338ca', hair: '#f59e0b', minLevel: 1, map: 'surface', x:(startX-1.5)*TILE, y:(startY-1.5)*TILE },
+    { id: 'domador', name: 'DOMADOR', color: '#22c55e', cloth: '#15803d', hair: '#78350f', minLevel: 1, map: 'surface', x:(startX+1.5)*TILE, y:(startY+1.5)*TILE },
+    { id: 'alquimista', name: 'ALQUIMISTA', color: '#a855f7', cloth: '#6b21a8', hair: '#14b8a6', minLevel: 2, map: 'surface', x:(startX-3.0)*TILE, y:(startY+2.0)*TILE },
+    { id: 'engenheiro', name: 'ENGENHEIRO', color: '#f97316', cloth: '#c2410c', hair: '#64748b', minLevel: 3, map: 'surface', x:(startX+3.0)*TILE, y:(startY-2.5)*TILE },
+    { id: 'pedreiro', name: 'PEDREIRO', color: '#94a3b8', cloth: '#475569', hair: '#b45309', minLevel: 4, map: 'surface', x:(startX-4.0)*TILE, y:(startY-1.0)*TILE },
+    { id: 'armador', name: 'ARMADOR', color: '#06b6d4', cloth: '#0e7490', hair: '#ec4899', minLevel: 5, map: 'surface', x:(startX+4.0)*TILE, y:(startY+0.5)*TILE }
   ];
 
   const canvas = document.getElementById('game');
@@ -359,7 +350,7 @@
   window.closeConfig = function() { document.getElementById('configMenu').style.display = 'none'; document.getElementById('mainMenu').style.display = 'flex'; };
   window.changeGraphics = function(val) {
     graphicLevel = parseInt(val);
-    const labels = ["Podre (Modo Batata)", "Bonito (Sombras)", "Ostentação (Efeitos Lux)"];
+    const labels = ["Simples (Desempenho)", "Lindo (Sombras)", "Ostentação (Efeitos de Luz e Partículas Ultra)"];
     document.getElementById('graphicLabel').textContent = "Qualidade Visual: " + labels[graphicLevel-1];
   };
 
@@ -386,14 +377,10 @@
     hitCooldown = 0.8;
     updateHealthUI();
     if(playerHP <= 0) {
-      openSystemDialog("SISTEMA", "Você desmaiou! Renascendo no centro da vila...", []);
+      openSystemDialog("SISTEMA", "Você desmaiou! Voltando para a segurança da vila...", []);
       setTimeout(() => {
-        playerHP = 100;
-        player.x = (startX+0.5)*TILE;
-        player.y = (startY+0.5)*TILE;
-        currentMap = "surface";
-        updateHealthUI();
-        closeDialogMenu();
+        playerHP = 100; player.x = (startX+0.5)*TILE; player.y = (startY+0.5)*TILE; currentMap = "surface";
+        updateHealthUI(); closeDialogMenu();
       }, 2000);
     }
   }
@@ -405,7 +392,7 @@
       villageLevel++; 
       if(villageLevel === 5 && !boatSpawnedAlertTriggered) {
         boatSpawnedAlertTriggered = true;
-        openSystemDialog("AVISO IMPORTANTE", "A Vila atingiu o Nível 5! Um Barco de Exploração atracou na ponta esquerda da praia!", []);
+        openSystemDialog("AVISO DE EMBARQUE", "A Vila cresceu para o Nível 5! O Barco Transcontinental atracou no cais oeste!", []);
         setTimeout(closeDialogMenu, 4000);
       }
     }
@@ -414,7 +401,7 @@
   }
 
   window.showCalendarDetails = function() {
-    openSystemDialog("CALENDÁRIO", `Ano: ${currentYear} | Mês: ${currentMonth}<br>Estação Atual: ${currentStation}<br>Clima Hoje: ${currentWeather}<br><br>💡 No Mês 5 do Ano 1, um Heliponto será concluído!`, []);
+    openSystemDialog("CALENDÁRIO DA ILHA", `Ano: ${currentYear} | Mês: ${currentMonth}<br>Estação: ${currentStation}<br>Clima: ${currentWeather}<br><br>✨ No Mês 5 do Ano 1, o Heliponto Urbano estará operacional!`, []);
     setTimeout(closeDialogMenu, 4000);
   };
 
@@ -433,7 +420,7 @@
     if (activeSlot === 3) currentT = inventory.shovelTier === 2 ? "Pá Cristal" : inventory.shovelTier === 1 ? "Pá Cobre" : "Nenhuma";
     if (activeSlot === 4) currentT = inventory.swordTier === 2 ? "Esp. Cristal" : inventory.swordTier === 1 ? "Esp. Cobre" : "Nenhuma";
     document.getElementById('inv-tool').textContent = currentT;
-    document.getElementById('inv-armor').textContent = hasArmor ? "Lendária (50% Defesa)" : "Nenhuma";
+    document.getElementById('inv-armor').textContent = hasArmor ? "Lendária (Vila 5)" : "Nenhuma";
   }
   window.toggleInventory = toggleInventory;
 
@@ -454,8 +441,7 @@
     updateMaterialsDragCount(); renderCraftGrid(); updateHotbarUI();
   };
   window.removeIngredient = idx => {
-    let mat = craftGrid[idx];
-    if(mat) { inventory[mat]++; craftGrid[idx] = ""; }
+    let mat = craftGrid[idx]; if(mat) { inventory[mat]++; craftGrid[idx] = ""; }
     updateMaterialsDragCount(); renderCraftGrid(); updateHotbarUI();
   };
   window.clearCraftingGrid = () => {
@@ -476,35 +462,24 @@
 
   window.craftItem3x3 = function() {
     const r = craftGrid;
-    // Picaretas
     if((r[0]==="copper"||r[0]==="ore") && r[1]===r[0] && r[2]===r[0] && r[4]==="wood" && r[7]==="wood") {
-      inventory.pickaxeTier = r[0]==="ore" ? 2 : 1;
-      openSystemDialog("SISTEMA", "Picareta construída! Agora use o Slot 3 para minerar.", []);
+      inventory.pickaxeTier = r[0]==="ore" ? 2 : 1; openSystemDialog("SISTEMA", "Picareta Forjada! Slot [3] para equipar.", []);
       craftGrid.fill(""); closeCraftTable(); setTimeout(closeDialogMenu, 1500);
-    } 
-    // Pás (Formato vertical de T inverso ou simples)
-    else if((r[1]==="copper"||r[1]==="ore") && r[4]==="wood" && r[7]==="wood") {
-      inventory.shovelTier = r[1]==="ore" ? 2 : 1;
-      openSystemDialog("SISTEMA", "Pá construída! Agora use o Slot 4 para cavar pilhas de terra.", []);
+    } else if((r[1]==="copper"||r[1]==="ore") && r[4]==="wood" && r[7]==="wood") {
+      inventory.shovelTier = r[1]==="ore" ? 2 : 1; openSystemDialog("SISTEMA", "Pá Forjada! Slot [4] para equipar.", []);
       craftGrid.fill(""); closeCraftTable(); setTimeout(closeDialogMenu, 1500);
-    }
-    // Espadas (Lâmina em linha vertical)
-    else if((r[1]==="copper"||r[1]==="ore") && r[4]===r[1] && r[7]==="wood") {
-      inventory.swordTier = r[1]==="ore" ? 2 : 1;
-      openSystemDialog("SISTEMA", "Espada construída! Use o Slot 5 para combater aranhas rapidamente.", []);
+    } else if((r[1]==="copper"||r[1]==="ore") && r[4]===r[1] && r[7]==="wood") {
+      inventory.swordTier = r[1]==="ore" ? 2 : 1; openSystemDialog("SISTEMA", "Espada Forjada! Slot [5] para o combate.", []);
       craftGrid.fill(""); closeCraftTable(); setTimeout(closeDialogMenu, 1500);
-    }
-    // Carro
-    else if(r[3]==="ore" && r[4]==="ore" && r[5]==="ore" && r[6]==="wood" && r[7]==="ore" && r[8]==="wood") {
-      inventory.car++; openSystemDialog("SISTEMA", "Carro construído! Use o Slot 6.", []);
+    } else if(r[3]==="ore" && r[4]==="ore" && r[5]==="ore" && r[6]==="wood" && r[7]==="ore" && r[8]==="wood") {
+      inventory.car++; openSystemDialog("SISTEMA", "Veículo Motorizado Forjado! Slot [6] para ativar.", []);
       craftGrid.fill(""); closeCraftTable(); setTimeout(closeDialogMenu, 1500);
-    } else { openSystemDialog("SISTEMA", "Receita incorreta!", []); }
+    } else { openSystemDialog("SISTEMA", "Receita não reconhecida pela forja.", []); }
     updateHotbarUI();
   };
 
   function openSystemDialog(name, text, options) {
-    document.getElementById('dName').innerHTML = name;
-    document.getElementById('dText').innerHTML = text;
+    document.getElementById('dName').innerHTML = name; document.getElementById('dText').innerHTML = text;
     const optsDiv = document.getElementById('dOpts'); optsDiv.innerHTML = "";
     options.forEach(opt => {
       const btn = document.createElement('button'); btn.className = "opt-btn";
@@ -515,65 +490,40 @@
 
   function triggerTravelCutscene(targetMapName, spawnX, spawnY) {
     const overlay = document.getElementById('cutsceneOverlay');
-    overlay.style.display = 'flex';
-    gameRunning = false;
-    
+    overlay.style.display = 'flex'; gameRunning = false;
     setTimeout(() => {
-      overlay.style.display = 'none';
-      gameRunning = true;
-      currentMap = targetMapName;
-      player.x = spawnX;
-      player.y = spawnY;
+      overlay.style.display = 'none'; gameRunning = true; currentMap = targetMapName;
+      player.x = spawnX; player.y = spawnY;
     }, 4000);
   }
 
   function generateIAContinent() {
-    // IA procedural gerando biomas baseados na estação ou de forma mista
-    const biomeRnd = Math.random();
-    let generator = null;
-    
-    if (biomeRnd < 0.33) {
-      // Bioma de Deserto/Praia Seca
-      generator = (x, y, currentB) => (currentB === BIOME.MOUNTAIN ? BIOME.MOUNTAIN : BIOME.SAND);
-    } else if (biomeRnd < 0.66) {
-      // Bioma de Neve Extrema
-      generator = (x, y, currentB) => (currentB === BIOME.MOUNTAIN ? BIOME.MOUNTAIN : BIOME.SNOW);
-    } else {
-      // Bioma Floresta de Outono Denso
-      generator = (x, y, currentB) => currentB;
-    }
-    
+    const biomeRnd = Math.random(); let generator = null;
+    if (biomeRnd < 0.33) generator = (x, y, currentB) => (currentB === BIOME.MOUNTAIN ? BIOME.MOUNTAIN : BIOME.SAND);
+    else if (biomeRnd < 0.66) generator = (x, y, currentB) => (currentB === BIOME.MOUNTAIN ? BIOME.MOUNTAIN : BIOME.SNOW);
+    else generator = (x, y, currentB) => currentB;
     initSurfaceMap('continent_2', generator);
   }
 
   function tryInteract(){
     if(currentInteractingNPC) return;
 
-    // Interação com o Barco (na ponta esquerda da praia: x ~ 2*TILE, y ~ centro)
     if (villageLevel >= 5 && Math.hypot((2.5*TILE) - player.x, (Math.floor(WORLD/2)*TILE) - player.y) < 50) {
-      if (currentMap === 'surface') {
-        generateIAContinent(); // IA gera um bioma inédito toda vez que viaja
-        triggerTravelCutscene('continent_2', (WORLD-4)*TILE, (Math.floor(WORLD/2)*TILE));
-      } else if (currentMap === 'continent_2') {
-        triggerTravelCutscene('surface', 4*TILE, (Math.floor(WORLD/2)*TILE));
-      }
+      if (currentMap === 'surface') { generateIAContinent(); triggerTravelCutscene('continent_2', (WORLD-4)*TILE, (Math.floor(WORLD/2)*TILE)); }
+      else if (currentMap === 'continent_2') { triggerTravelCutscene('surface', 4*TILE, (Math.floor(WORLD/2)*TILE)); }
       return;
     }
 
-    // Interação com o Heliponto / Helicóptero (Fica pronto no mês 5 do Ano 1)
     if ((currentYear > 1 || currentMonth >= 5) && Math.hypot((4*TILE) - player.x, (Math.floor(WORLD/2 - 2)*TILE) - player.y) < 50) {
-      if (currentMap === 'surface') {
-        triggerTravelCutscene('city', (WORLD/2)*TILE, (WORLD-5)*TILE);
-      } else if (currentMap === 'city') {
-        triggerTravelCutscene('surface', 4*TILE, (Math.floor(WORLD/2 - 4)*TILE));
-      }
+      if (currentMap === 'surface') { triggerTravelCutscene('city', (WORLD/2)*TILE, (WORLD-5)*TILE); }
+      else if (currentMap === 'city') { triggerTravelCutscene('surface', 4*TILE, (Math.floor(WORLD/2 - 4)*TILE)); }
       return;
     }
 
     for(const p of portals) {
       if(currentMap === p.from && Math.hypot(p.x - player.x, p.y - player.y) < 32) {
         if(p.requiresHouse && !houseBuilt) {
-          openSystemDialog("SISTEMA", "Fale com o Pedreiro no Nível 4 para construir esta casa primeiro!", []);
+          openSystemDialog("CONSTRUÇÃO", "O interior estará disponível quando o Pedreiro concluir a obra.", []);
           setTimeout(closeDialogMenu, 2000); return;
         }
         currentMap = p.to;
@@ -597,14 +547,14 @@
 
     for(const node of resourceNodes) {
       if(node.map === currentMap && node.hp > 0 && Math.hypot(node.x - player.x, node.y - player.y) < 42) {
-        if(node.type === 'tree' && activeSlot === 1) { node.hp = 0; inventory.wood += 2; if(currentStation==="Outono") inventory.seasonItems += 1; }
-        else if(node.type === 'dirt_pile' && activeSlot === 3 && inventory.shovelTier > 0) { node.hp = 0; inventory.seasonItems += 2; }
-        else if(node.type === 'copper' && activeSlot === 2 && inventory.pickaxeTier >= 0) { node.hp = 0; inventory.copper += 2; }
-        else if(node.type === 'iron' && activeSlot === 2 && inventory.pickaxeTier >= 1) { node.hp = 0; inventory.iron += 2; }
-        else if(node.type === 'ore' && activeSlot === 2 && inventory.pickaxeTier >= 1) { node.hp = 0; inventory.ore += 2; }
-        else if(node.type === 'diamond' && activeSlot === 2 && inventory.pickaxeTier >= 2) { node.hp = 0; inventory.diamond += 2; }
+        if(node.type === 'tree' && activeSlot === 1) { node.hp = 0; inventory.wood += 2; spawnLeafParticles(node.x, node.y, '#16a34a'); if(currentStation==="Outono") inventory.seasonItems += 1; }
+        else if(node.type === 'dirt_pile' && activeSlot === 3 && inventory.shovelTier > 0) { node.hp = 0; inventory.seasonItems += 2; spawnLeafParticles(node.x, node.y, '#78350f'); }
+        else if(node.type === 'copper' && activeSlot === 2 && inventory.pickaxeTier >= 0) { node.hp = 0; inventory.copper += 2; spawnLeafParticles(node.x, node.y, '#fbbf24'); }
+        else if(node.type === 'iron' && activeSlot === 2 && inventory.pickaxeTier >= 1) { node.hp = 0; inventory.iron += 2; spawnLeafParticles(node.x, node.y, '#94a3b8'); }
+        else if(node.type === 'ore' && activeSlot === 2 && inventory.pickaxeTier >= 1) { node.hp = 0; inventory.ore += 2; spawnLeafParticles(node.x, node.y, '#22d3ee'); }
+        else if(node.type === 'diamond' && activeSlot === 2 && inventory.pickaxeTier >= 2) { node.hp = 0; inventory.diamond += 2; spawnLeafParticles(node.x, node.y, '#a5f3fc'); }
         else {
-          openSystemDialog("AVISO", "Você precisa equipar a ferramenta certa ou nível maior!", []);
+          openSystemDialog("EQUIPAMENTO", "Ferramenta incorreta ou nível insuficiente.", []);
           setTimeout(closeDialogMenu, 1500); return;
         }
         updateHotbarUI(); return;
@@ -615,76 +565,50 @@
   function handleNPCMenu(npc) {
     currentInteractingNPC = npc;
     if(npc.id === 'mercador') {
-      openSystemDialog(npc.name, "Olá! Troco 10 Madeiras por 4 Cristais. Deseja negociar?", [
-        { label: "Sim, trocar!", action: () => processTrade(npc, null) },
-        { label: "Não, obrigado", action: () => closeDialogMenu() }
+      openSystemDialog(npc.name, "Saudações! Troco 10 Madeiras Brutalistas por 4 Cristais Prismáticos.", [
+        { label: "Aceitar Troca", action: () => processTrade(npc, null) }, { label: "Sair", action: () => closeDialogMenu() }
       ]);
-    } 
-    else if(npc.id === 'domador') {
-      openSystemDialog(npc.name, "Adote um pet por 2 Cristais! Qual você quer?", [
-        { label: "Eu quero um Cão! 🐕", action: () => processTrade(npc, 'dog') },
-        { label: "Eu quero um Gato! 🐈", action: () => processTrade(npc, 'cat') },
-        { label: "Não, obrigado", action: () => closeDialogMenu() }
+    } else if(npc.id === 'domador') {
+      openSystemDialog(npc.name, "Deseja um companheiro de jornada por 2 Cristais?", [
+        { label: "Adotar Cão 🐕", action: () => processTrade(npc, 'dog') }, { label: "Adotar Gato 🐈", action: () => processTrade(npc, 'cat') }, { label: "Recusar", action: () => closeDialogMenu() }
       ]);
-    }
-    else if(npc.id === 'alquimista') {
-      openSystemDialog(npc.name, "Compre uma poção de velocidade permanente por 4 Cristais!", [
-        { label: "Beber Poção", action: () => processTrade(npc, 'potion') },
-        { label: "Recusar", action: () => closeDialogMenu() }
+    } else if(npc.id === 'alquimista') {
+      openSystemDialog(npc.name, "Elixir de Agilidade Cinética Permanente por 4 Cristais.", [
+        { label: "Consumir Elixir", action: () => processTrade(npc, 'potion') }, { label: "Sair", action: () => closeDialogMenu() }
       ]);
-    }
-    else if(npc.id === 'engenheiro') {
-      openSystemDialog(npc.name, "Super Motor Hidráulico para seu carro por 6 Cristais!", [
-        { label: "Comprar Motor", action: () => processTrade(npc, 'engine') },
-        { label: "Recusar", action: () => closeDialogMenu() }
+    } else if(npc.id === 'engenheiro') {
+      openSystemDialog(npc.name, "Propulsor de Combustão Nitro para o Carro por 6 Cristais.", [
+        { label: "Instalar Motor Ultra", action: () => processTrade(npc, 'engine') }, { label: "Recusar", action: () => closeDialogMenu() }
       ]);
-    }
-    else if(npc.id === 'pedreiro') {
-      let msg = houseBuilt ? "Sua casa já está pronta e linda!" : "Posso expandir sua casa e dar um interior completo! Custo: 20 Cristais.";
-      let opts = houseBuilt ? [{ label: "Sair", action: () => closeDialogMenu() }] : [
-        { label: "Construir Casa (20 Cristais)", action: () => processTrade(npc, 'house') },
-        { label: "Depois", action: () => closeDialogMenu() }
+    } else if(npc.id === 'pedreiro') {
+      let msg = houseBuilt ? "A infraestrutura residencial está concluída." : "Posso erguer sua Mansão com Forja integrada por 20 Cristais.";
+      let opts = houseBuilt ? [{ label: "Fechar", action: () => closeDialogMenu() }] : [
+        { label: "Iniciar Obras", action: () => processTrade(npc, 'house') }, { label: "Agora Não", action: () => closeDialogMenu() }
       ];
       openSystemDialog(npc.name, msg, opts);
-    }
-    else if(npc.id === 'armador') {
-      let msg = hasArmor ? "Sua Armadura Lendária está equipada." : "Posso forjar uma Armadura Lendária! Requisitos: 5 Ferros e 5 Diamantes.";
+    } else if(npc.id === 'armador') {
+      let msg = hasArmor ? "Exotraje de Defesa Ativa Equipado." : "Forjo um Exotraje de Blindagem Pesada por 5 Ferros e 5 Diamantes.";
       let opts = hasArmor ? [{ label: "Sair", action: () => closeDialogMenu() }] : [
-        { label: "Forjar Armadura", action: () => processTrade(npc, 'armor') },
-        { label: "Voltar", action: () => closeDialogMenu() }
+        { label: "Forjar Exotraje", action: () => processTrade(npc, 'armor') }, { label: "Voltar", action: () => closeDialogMenu() }
       ];
       openSystemDialog(npc.name, msg, opts);
     }
   }
 
   function processTrade(npc, specialType) {
-    if(npc.id === 'mercador' && inventory.wood >= 10) {
-      inventory.wood -= 10; inventory.ore += 4; addVillagePoint(); updateHotbarUI(); closeDialogMenu();
-    } 
+    if(npc.id === 'mercador' && inventory.wood >= 10) { inventory.wood -= 10; inventory.ore += 4; addVillagePoint(); updateHotbarUI(); closeDialogMenu(); } 
     else if(npc.id === 'domador' && inventory.ore >= 2) {
       inventory.ore -= 2; inventory.pets++; addVillagePoint(); updateHotbarUI();
-      followedPets.push({ isDog: (specialType==='dog'), x:player.x, y:player.y, offset:Math.random()*20 });
+      followedPets.push({ isDog: (specialType==='dog'), x:player.x, y:player.y, offset:Math.random()*20, color: specialType==='dog'?'#d97706':'#94a3b8' });
       closeDialogMenu();
-    }
-    else if(npc.id === 'alquimista' && inventory.ore >= 4) {
-      inventory.ore -= 4; speedMultiplierWalk += 0.35; addVillagePoint(); updateHotbarUI(); closeDialogMenu();
-    }
-    else if(npc.id === 'engenheiro' && inventory.ore >= 6) {
-      inventory.ore -= 6; speedMultiplierCar += 1.5; addVillagePoint(); updateHotbarUI(); closeDialogMenu();
-    }
+    } else if(npc.id === 'alquimista' && inventory.ore >= 4) { inventory.ore -= 4; speedMultiplierWalk += 0.45; addVillagePoint(); updateHotbarUI(); closeDialogMenu(); }
+    else if(npc.id === 'engenheiro' && inventory.ore >= 6) { inventory.ore -= 6; speedMultiplierCar += 2.0; addVillagePoint(); updateHotbarUI(); closeDialogMenu(); }
     else if(npc.id === 'pedreiro' && inventory.ore >= 20 && !houseBuilt) {
       inventory.ore -= 20; houseBuilt = true; addVillagePoint();
-      craftingTable.map = 'house_interior';
-      craftingTable.x = (WORLD / 2)*TILE; craftingTable.y = (WORLD / 2 - 2)*TILE;
+      craftingTable.map = 'house_interior'; craftingTable.x = (WORLD / 2)*TILE; craftingTable.y = (WORLD / 2 - 2)*TILE;
       closeDialogMenu();
-    }
-    else if(npc.id === 'armador' && inventory.iron >= 5 && inventory.diamond >= 5 && !hasArmor) {
-      inventory.iron -= 5; inventory.diamond -= 5; hasArmor = true; addVillagePoint(); updateHotbarUI();
-      closeDialogMenu();
-    }
-    else {
-      openSystemDialog(npc.name, "Recursos insuficientes!", [{ label: "Voltar", action: () => handleNPCMenu(npc) }]);
-    }
+    } else if(npc.id === 'armador' && inventory.iron >= 5 && inventory.diamond >= 5 && !hasArmor) { inventory.iron -= 5; inventory.diamond -= 5; hasArmor = true; addVillagePoint(); updateHotbarUI(); closeDialogMenu(); }
+    else { openSystemDialog(npc.name, "Recursos insuficientes na reserva.", [{ label: "Voltar", action: () => handleNPCMenu(npc) }]); }
   }
 
   function closeDialogMenu() { document.getElementById('dialog').style.display = 'none'; currentInteractingNPC = null; }
@@ -702,26 +626,17 @@
     if(!gameRunning || craftTableOpen) return;
     if(hitCooldown > 0) hitCooldown -= dt;
 
-    // Passagem do tempo e calendário
     gameTime += dt;
-    if (gameTime >= 8) { // A cada 8 segundos avança 1 dia
-      gameTime = 0;
-      currentDay++;
-      if (currentDay > 10) { // Meses curtos para dinâmica acelerada
-        currentDay = 1;
-        currentMonth++;
-        // Troca de Clima aleatória mensal
+    if (gameTime >= 10) { 
+      gameTime = 0; currentDay++;
+      if (currentDay > 10) {
+        currentDay = 1; currentMonth++;
         currentWeather = WEATHERS[Math.floor(Math.random() * WEATHERS.length)];
-        // Troca de Estação
         currentStation = STATIONS[(currentMonth - 1) % 4];
-        if (currentMonth > 12) {
-          currentMonth = 1;
-          currentYear++;
-        }
+        if (currentMonth > 12) { currentMonth = 1; currentYear++; }
       }
       document.getElementById('calDay').textContent = currentDay + " (Mês " + currentMonth + ")";
-      
-      let weatherIcons = { "Sol":"☀️ Sol", "Chuva":"🌧️ Chuva", "Nublado":"☁️ Nubl.", "Sereno":"🌫️ Sereno" };
+      let weatherIcons = { "Sol":"☀️ Sol", "Chuva":"🌧️ Tempestade", "Nublado":"☁️ Nevoeiro", "Sereno":"🌫️ Brisa Velada" };
       document.getElementById('calWeather').textContent = weatherIcons[currentWeather];
     }
 
@@ -734,52 +649,50 @@
     if(dx||dy){
       const len=Math.hypot(dx,dy);
       let currentSpeed = player.speed * (inventory.ridingCar ? speedMultiplierCar : speedMultiplierWalk);
-      // Reduzir velocidade se estiver chovendo ou nevando/sereno
-      if (currentWeather === "Chuva" || currentWeather === "Sereno") currentSpeed *= 0.85;
+      if (currentWeather === "Chuva" || currentWeather === "Sereno") currentSpeed *= 0.82;
 
       const nx = player.x + (dx/len)*currentSpeed*dt; const ny = player.y + (dy/len)*currentSpeed*dt;
-      
       let tx = Math.floor(nx/TILE), ty = Math.floor(ny/TILE);
       if(tx>=0 && tx<WORLD && ty>=0 && ty<WORLD && currentGrid[tx] && !BLOCKING.has(currentGrid[tx][ty].biome)) {
         player.x = nx; player.y = ny;
       }
+      
+      if(graphicLevel === 3 && waveTicks % 5 === 0) {
+        particles.push({ x: player.x, y: player.y + 6, vx: -dx*4, vy: -dy*2, life: 0.5, color: 'rgba(255,255,255,0.2)', size: 3 });
+      }
     }
 
-    // Comportamento dos Monstros
+    for (let i = particles.length - 1; i >= 0; i--) {
+      let p = particles[i]; p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+
     monsters.forEach(m => {
       if(m.map !== currentMap) return;
       let dist = Math.hypot(player.x - m.x, player.y - m.y);
-      
       if(dist < 20) {
-        let dmg = m.type === 'poison' ? 25 : 10;
-        // Se o player estiver com a Espada ativa, causa contra-ataque e reduz dano recebido
-        if (activeSlot === 4 && inventory.swordTier > 0) {
-          dmg = Math.floor(dmg * 0.4);
-          m.x -= (player.dir * 40); // Empurra a aranha para trás
-        }
+        let dmg = m.type === 'poison' ? 24 : 12;
+        if (activeSlot === 4 && inventory.swordTier > 0) { dmg = Math.floor(dmg * 0.3); m.x -= (player.dir * 45); }
         takeDamage(dmg);
       }
-
       m.timer -= dt;
-      if(dist < 120) { m.targetX = player.x; m.targetY = player.y; }
+      if(dist < 140) { m.targetX = player.x; m.targetY = player.y; }
       else if(m.timer <= 0) {
-        m.timer = 3 + Math.random()*4;
-        m.targetX = m.startX + (Math.random()-0.5)*100; m.targetY = m.startY + (Math.random()-0.5)*100;
+        m.timer = 2 + Math.random()*3;
+        m.targetX = m.startX + (Math.random()-0.5)*120; m.targetY = m.startY + (Math.random()-0.5)*120;
       }
-      let mdx = m.targetX - m.x, mdy = m.targetY - m.y;
-      let mdist = Math.hypot(mdx, mdy);
+      let mdx = m.targetX - m.x, mdy = m.targetY - m.y; let mdist = Math.hypot(mdx, mdy);
       if(mdist > 5) { m.x += (mdx/mdist)*m.speed*dt; m.y += (mdy/mdist)*m.speed*dt; }
     });
 
     followedPets.forEach((pet, i) => {
-      let tx = player.x - (player.dir * 22) - (i * 12);
-      let ty = player.y + 4 + Math.sin(waveTicks*0.15 + pet.offset)*2;
-      if(Math.hypot(tx - pet.x, ty - pet.y) > 16) { pet.x += (tx - pet.x) * 0.12; pet.y += (ty - pet.y) * 0.12; }
+      let tx = player.x - (player.dir * 24) - (i * 14); let ty = player.y + 4 + Math.sin(waveTicks*0.15 + pet.offset)*2;
+      if(Math.hypot(tx - pet.x, ty - pet.y) > 16) { pet.x += (tx - pet.x) * 0.14; pet.y += (ty - pet.y) * 0.14; }
     });
   }
 
   function drawGame() {
-    ctx.fillStyle = '#0f0f14'; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    ctx.fillStyle = '#050508'; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
     const camX = Math.max(0, Math.min(WORLD*TILE-VIEW_W, player.x - VIEW_W/2));
     const camY = Math.max(0, Math.min(WORLD*TILE-VIEW_H, player.y - VIEW_H/2));
@@ -794,124 +707,241 @@
         const bx = x*TILE - camX; const by = y*TILE - camY;
         
         let biomeColor = COLORS[currentGrid[x][y].biome];
-        // Mudança visual de acordo com a estação nas gramas
         if (currentGrid[x][y].biome === BIOME.GRASS) {
-          if (currentStation === "Outono") biomeColor = "#b58231";
-          else if (currentStation === "Inverno") biomeColor = "#639a8a";
-          else if (currentStation === "Primavera") biomeColor = "#48bb78";
+          if (currentStation === "Outono") biomeColor = "#a76f28";
+          else if (currentStation === "Inverno") biomeColor = "#497c72";
+          else if (currentStation === "Primavera") biomeColor = "#1f8a65";
         }
 
-        ctx.fillStyle = biomeColor;
-        ctx.fillRect(bx, by, TILE, TILE);
+        ctx.fillStyle = biomeColor; ctx.fillRect(bx, by, TILE, TILE);
+
+        if (graphicLevel >= 2 && (currentGrid[x][y].biome === BIOME.MOUNTAIN || currentGrid[x][y].biome === BIOME.WALL)) {
+          ctx.fillStyle = "rgba(0,0,0,0.25)"; ctx.fillRect(bx, by + TILE - 6, TILE, 6);
+        }
+        if (graphicLevel === 3 && currentGrid[x][y].seed > 0.6) {
+          ctx.fillStyle = "rgba(255,255,255,0.03)"; ctx.fillRect(bx + (currentGrid[x][y].seed*10), by + (currentGrid[x][y].seed*15), 4, 4);
+        }
       }
     }
 
-    // Desenhar Estruturas Especiais: Barco (Nível 5)
     if (villageLevel >= 5 && currentMap === 'surface') {
       const bx = (2.5*TILE) - camX, by = (Math.floor(WORLD/2)*TILE) - camY;
-      ctx.fillStyle = '#3e2723'; ctx.fillRect(bx-12, by-6, 32, 16);
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(bx+2, by-18, 4, 12); // Vela
-      ctx.fillStyle = '#ffaa00'; ctx.font = '9px sans-serif'; ctx.fillText("⛵ BARCO", bx-10, by-24);
+      ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(bx-16, by, 40, 24); 
+      ctx.fillStyle = '#2b1810'; ctx.fillRect(bx-12, by-4, 34, 16); 
+      ctx.fillStyle = '#f1f5f9'; ctx.beginPath(); ctx.moveTo(bx+5, by-4); ctx.lineTo(bx+18, by-18); ctx.lineTo(bx+5, by-18); ctx.closePath(); ctx.fill(); 
+      ctx.fillStyle = '#e2e8f0'; ctx.fillRect(bx+3, by-22, 2, 18); 
     }
     if (currentMap === 'continent_2') {
       const bx = ((WORLD-4)*TILE) - camX, by = (Math.floor(WORLD/2)*TILE) - camY;
-      ctx.fillStyle = '#3e2723'; ctx.fillRect(bx-12, by-6, 32, 16);
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(bx+2, by-18, 4, 12);
+      ctx.fillStyle = '#2b1810'; ctx.fillRect(bx-12, by-4, 34, 16);
+      ctx.fillStyle = '#f1f5f9'; ctx.beginPath(); ctx.moveTo(bx+5, by-4); ctx.lineTo(bx+18, by-18); ctx.lineTo(bx+5, by-18); ctx.closePath(); ctx.fill();
     }
 
-    // Desenhar Heliponto (Fase de obra ou completo)
     if (currentMap === 'surface') {
       const hx = (4*TILE) - camX, hy = (Math.floor(WORLD/2 - 2)*TILE) - camY;
       const isReady = (currentYear > 1 || currentMonth >= 5);
-      ctx.fillStyle = isReady ? '#374151' : '#78350f';
-      ctx.fillRect(hx-16, hy-16, 36, 36);
-      ctx.fillStyle = '#fff';
-      ctx.font = '10px sans-serif';
-      ctx.fillText(isReady ? "🚁 [H]" : "🚧 OBRA", hx-12, hy+6);
+      ctx.fillStyle = isReady ? '#1e293b' : '#451a03'; ctx.fillRect(hx-16, hy-16, 38, 38);
+      ctx.strokeStyle = isReady ? '#00ffcc' : '#f97316'; ctx.lineWidth = 2; ctx.strokeRect(hx-14, hy-14, 34, 34);
+      if (isReady && waveTicks % 30 < 15) { 
+        ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(hx-14, hy-14, 3, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(hx+20, hy+20, 3, 0, Math.PI*2); ctx.fill();
+      }
     }
+    
     if (currentMap === 'city') {
       const hx = ((WORLD/2)*TILE) - camX, hy = ((WORLD-5)*TILE) - camY;
-      ctx.fillStyle = '#374151'; ctx.fillRect(hx-16, hy-16, 36, 36);
-      ctx.fillStyle = '#fff'; ctx.font = '10px sans-serif'; ctx.fillText("🚁 ILHA", hx-12, hy+6);
+      ctx.fillStyle = '#1e293b'; ctx.fillRect(hx-16, hy-16, 38, 38);
+      ctx.strokeStyle = '#00ffcc'; ctx.lineWidth = 2; ctx.strokeRect(hx-14, hy-14, 34, 34);
 
-      // Desenhar Prédios e Lojas na Cidadezinha de forma simples
-      for(let i=-3; i<=3; i+=2) {
-        ctx.fillStyle = '#1e293b'; ctx.fillRect(((WORLD/2 + i)*TILE) - camX, (8*TILE) - camY, 40, 60); // Prédio
-        ctx.fillStyle = '#f59e0b'; ctx.fillRect(((WORLD/2 + i)*TILE + 10) - camX, (10*TILE) - camY, 20, 20); // Loja
+      for(let i=-4; i<=4; i+=2) {
+        let px = ((WORLD/2 + i)*TILE) - camX, py = (8*TILE) - camY;
+        ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(px-5, py, 46, 75); 
+        ctx.fillStyle = '#0f172a'; ctx.fillRect(px, py, 38, 70); 
+        ctx.fillStyle = (waveTicks + i*10) % 50 < 25 ? '#fde047' : '#38bdf8';
+        ctx.fillRect(px+6, py+10, 6, 6); ctx.fillRect(px+24, py+10, 6, 6);
+        ctx.fillRect(px+6, py+30, 6, 6); ctx.fillRect(px+24, py+30, 6, 6);
+        ctx.fillRect(px+15, py+50, 8, 12); 
       }
     }
 
-    // Portais básicos
     portals.forEach(p => {
-      if(currentMap !== p.from) return;
-      const px = p.x - camX, py = p.y - camY;
-      ctx.fillStyle = '#475569'; ctx.fillRect(px-4, py-4, TILE+8, TILE+8);
-      ctx.fillStyle = '#0f172a'; ctx.fillRect(px, py, TILE, TILE);
+      if(currentMap !== p.from) return; const px = p.x - camX, py = p.y - camY;
+      let grad = ctx.createRadialGradient(px+16, py+16, 2, px+16, py+16, 20);
+      grad.addColorStop(0, '#475569'); grad.addColorStop(0.7, '#0f172a'); grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad; ctx.fillRect(px-8, py-8, TILE+16, TILE+16);
     });
 
+    // RENDENIZAÇÃO DE UMA CASA BONITA / MANSÃO NO MAPA PRINCIPAL
     if(currentMap === 'surface' && houseBuilt) {
       const hx = (startX - 3.5)*TILE - camX, hy = (startY - 3.5)*TILE - camY;
-      ctx.fillStyle = '#d1fae5'; ctx.fillRect(hx, hy, 50, 40);
-    }
+      
+      // Sombra da Casa
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(hx - 8, hy - 4, 86, 68);
 
-    if(currentMap === craftingTable.map) {
-      const cx = craftingTable.x - camX, cy = craftingTable.y - camY;
-      ctx.fillStyle = '#5c3a21'; ctx.fillRect(cx - 12, cy - 12, 24, 24);
-    }
+      // Paredes Principais (Tijolo Decorado)
+      ctx.fillStyle = '#9c644c'; 
+      ctx.fillRect(hx, hy + 15, 70, 45);
+      
+      // Detalhes de Vigas Laterais
+      ctx.fillStyle = '#451a03';
+      ctx.fillRect(hx, hy + 15, 6, 45);
+      ctx.fillRect(hx + 64, hy + 15, 6, 45);
+      ctx.fillRect(hx, hy + 15, 70, 6);
 
-    resourceNodes.forEach(node => {
-      if(node.map !== currentMap || node.hp <= 0) return;
-      const sx = node.x - camX, sy = node.y - camY;
-      if(node.type === 'tree') {
-        ctx.fillStyle = '#78350f'; ctx.fillRect(sx-3, sy-2, 6, 12);
-        ctx.fillStyle = currentStation === "Outono" ? "#ea580c" : '#15803d'; 
-        ctx.beginPath(); ctx.arc(sx, sy-6, node.size, 0, Math.PI*2); ctx.fill();
-      } else if (node.type === 'dirt_pile') {
-        ctx.fillStyle = '#92400e'; ctx.beginPath(); ctx.moveTo(sx-8, sy+6); ctx.lineTo(sx, sy-6); ctx.lineTo(sx+8, sy+6); ctx.closePath(); ctx.fill();
-      } else {
-        const oreColors = { copper:'#d97706', iron:'#94a3b8', ore:'#0891b2', diamond:'#22d3ee' };
-        ctx.fillStyle = oreColors[node.type]; ctx.fillRect(sx-7, sy-7, 14, 14);
+      // Telhado Bonito em Escada Estilo Chalé (Laranja/Terracota)
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.moveTo(hx - 8, hy + 18);
+      ctx.lineTo(hx + 35, hy - 12);
+      ctx.lineTo(hx + 78, hy + 18);
+      ctx.closePath();
+      ctx.fill();
+
+      // Borda Inferior do Telhado (Destaque)
+      ctx.fillStyle = '#c2410c';
+      ctx.fillRect(hx - 10, hy + 15, 90, 4);
+
+      // Chaminé com Fumaça Dinâmica
+      ctx.fillStyle = '#4b5563';
+      ctx.fillRect(hx + 52, hy - 6, 10, 16);
+      if(waveTicks % 20 < 10 && graphicLevel === 3) {
+        ctx.fillStyle = 'rgba(200,200,200,0.4)';
+        ctx.beginPath(); ctx.arc(hx + 57, hy - 14, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(hx + 61, hy - 24, 7, 0, Math.PI * 2); ctx.fill();
       }
-    });
 
+      // Janela Iluminada Conchegante
+      ctx.fillStyle = '#fef08a';
+      ctx.fillRect(hx + 12, hy + 24, 14, 14);
+      ctx.strokeStyle = '#78350f'; ctx.lineWidth = 1.5;
+      ctx.strokeRect(hx + 12, hy + 24, 14, 14);
+      ctx.beginPath(); ctx.moveTo(hx + 19, hy + 24); ctx.lineTo(hx + 19, hy + 38); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(hx + 12, hy + 31); ctx.lineTo(hx + 26, hy + 31); ctx.stroke();
+
+      // Porta Elegante de Madeira Escura
+      ctx.fillStyle = '#451a03';
+      ctx.fillRect(hx + 38, hy + 30, 16, 30);
+      ctx.fillStyle = '#fbbf24'; // Maçaneta de ouro
+      ctx.beginPath(); ctx.arc(hx + 42, hy + 45, 2, 0, Math.PI*2); ctx.fill();
+    }
+
+    // RENDENIZAÇÃO DOS NPC'S MAIS BONITOS E DETALHADOS
     npcs.forEach(npc => {
       if(currentMap !== npc.map || villageLevel < npc.minLevel || currentInteractingNPC === npc) return;
       const nx = npc.x - camX, ny = npc.y - camY;
-      ctx.fillStyle = npc.color; ctx.beginPath(); ctx.arc(nx, ny, 8, 0, Math.PI*2); ctx.fill();
+      
+      // Sombra individual do NPC
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.beginPath(); ctx.arc(nx, ny + 11, 9, 0, Math.PI * 2); ctx.fill();
+
+      // Pernas/Pés (Base)
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(nx - 4, ny + 6, 3, 6);
+      ctx.fillRect(nx + 1, ny + 6, 3, 6);
+
+      // Corpo/Roupas Dinâmicas (Túnica/Camisa)
+      ctx.fillStyle = npc.cloth;
+      ctx.fillRect(nx - 6, ny - 3, 12, 10);
+
+      // Cabeça (Tom de Pele Realista)
+      ctx.fillStyle = '#ffedd5';
+      ctx.beginPath(); ctx.arc(nx, ny - 8, 6, 0, Math.PI * 2); ctx.fill();
+
+      // Cabelo ou Chapéu Temático do NPC
+      ctx.fillStyle = npc.hair;
+      ctx.beginPath(); ctx.arc(nx, ny - 12, 6, Math.PI, 0); ctx.fill(); // Cabelo topo
+      ctx.fillRect(nx - 6, ny - 12, 3, 6); // Franja esquerda
+      ctx.fillRect(nx + 3, ny - 12, 3, 6); // Franja direita
+
+      // Olhos Expressivos (Olham para frente/jogador)
+      ctx.fillStyle = '#000';
+      ctx.fillRect(nx - 3, ny - 9, 1.5, 2);
+      ctx.fillRect(nx + 1, ny - 9, 1.5, 2);
+
+      // Pequeno Indicador Flutuante Interativo (Apenas se o jogador estiver perto)
+      if(Math.hypot(npc.x - player.x, npc.y - player.y) < 50 && waveTicks % 20 < 12) {
+        ctx.fillStyle = '#ffaa00';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡ E', nx, ny - 20);
+      }
+    });
+
+    // Restante das renderizações do Mundo
+    resourceNodes.forEach(node => {
+      if(node.map !== currentMap || node.hp <= 0) return; const sx = node.x - camX, sy = node.y - camY;
+      if(node.type === 'tree') {
+        ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.arc(sx, sy+8, 14, 0, Math.PI*2); ctx.fill(); 
+        ctx.fillStyle = '#542c13'; ctx.fillRect(sx-3, sy-2, 6, 14);
+        let leafColor = currentStation === "Outono" ? "#ca8a04" : (currentStation === "Inverno" ? "#315e54" : '#16a34a');
+        ctx.fillStyle = leafColor; ctx.beginPath(); ctx.arc(sx, sy-6, node.size, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.beginPath(); ctx.arc(sx-4, sy-10, node.size*0.5, 0, Math.PI*2); ctx.fill(); 
+      } else if (node.type === 'dirt_pile') {
+        ctx.fillStyle = '#7c2d12'; ctx.beginPath(); ctx.moveTo(sx-9, sy+8); ctx.lineTo(sx, sy-7); ctx.lineTo(sx+9, sy+8); ctx.closePath(); ctx.fill();
+      } else {
+        const oreColors = { copper:'#eab308', iron:'#cbd5e1', ore:'#22d3ee', diamond:'#a5f3fc' };
+        ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(sx-8, sy+2, 16, 8); 
+        ctx.fillStyle = oreColors[node.type]; ctx.fillRect(sx-7, sy-7, 14, 14);
+        ctx.fillStyle = '#fff'; ctx.fillRect(sx-3, sy-5, 4, 4); 
+      }
     });
 
     monsters.forEach(m => {
-      if(m.map !== currentMap) return;
-      const mx = m.x - camX, my = m.y - camY;
-      ctx.fillStyle = m.type === 'poison' ? '#22c55e' : '#ef4444'; 
-      ctx.beginPath(); ctx.arc(mx, my, 6, 0, Math.PI*2); ctx.fill();
+      if(m.map !== currentMap) return; const mx = m.x - camX, my = m.y - camY;
+      ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.beginPath(); ctx.arc(mx, my+6, 7, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = m.type === 'poison' ? '#22c55e' : '#ef4444'; ctx.beginPath(); ctx.arc(mx, my, 7, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(mx - (player.dir*2), my - 1, 2, 0, Math.PI*2); ctx.fill(); 
     });
 
+    followedPets.forEach((pet) => {
+      const px = pet.x - camX, py = pet.y - camY;
+      ctx.fillStyle = pet.color; ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI*2); ctx.fill();
+    });
+
+    particles.forEach(p => {
+      ctx.fillStyle = p.color; ctx.fillRect(p.x - camX, p.y - camY, p.size, p.size);
+    });
+
+    // Personagem Principal
     const sx = player.x - camX, sy = player.y - camY;
+    ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(sx-10, sy+8, 20, 6); 
+
     if(inventory.ridingCar) {
-      ctx.fillStyle = '#b91c1c'; ctx.fillRect(sx - 14, sy - 7, 28, 12);
+      ctx.fillStyle = '#dc2626'; ctx.fillRect(sx - 16, sy - 5, 32, 14); 
+      ctx.fillStyle = '#1e293b'; ctx.fillRect(sx - 12, sy - 9, 20, 5);  
+      ctx.fillStyle = '#fde047'; ctx.fillRect(player.dir > 0 ? sx+12 : sx-15, sy-2, 4, 4); 
     } else {
-      ctx.fillStyle = '#1d4ed8'; ctx.beginPath(); ctx.arc(sx, sy+1, 8, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#ffdbb5'; ctx.beginPath(); ctx.arc(sx, sy-4, 5, 0, Math.PI*2); ctx.fill();
-    }
-
-    // Efeitos Climáticos na Tela (Chuva/Sereno)
-    if (currentWeather === "Chuva") {
-      ctx.fillStyle = "rgba(174,196,243,0.22)";
-      for(let i=0; i<6; i++) {
-        ctx.fillRect(Math.random()*VIEW_W, Math.random()*VIEW_H, 2, 14);
+      ctx.fillStyle = '#2563eb'; ctx.beginPath(); ctx.arc(sx, sy+2, 8, 0, Math.PI*2); ctx.fill(); 
+      ctx.fillStyle = '#fbcfe8'; ctx.beginPath(); ctx.arc(sx, sy-4, 5, 0, Math.PI*2); ctx.fill();  
+      if (activeSlot === 4 && inventory.swordTier > 0) { 
+        ctx.strokeStyle = inventory.swordTier === 2 ? '#22d3ee' : '#fbbf24'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(sx + (player.dir*8), sy); ctx.lineTo(sx + (player.dir*18), sy - 8); ctx.stroke();
       }
-    } else if (currentWeather === "Sereno") {
-      ctx.fillStyle = "rgba(255,255,255,0.12)";
-      ctx.fillRect(0, 0, VIEW_W, VIEW_H);
     }
 
+    if (currentWeather === "Chuva") {
+      ctx.fillStyle = "rgba(156,163,175,0.25)";
+      for(let i=0; i<18; i++) ctx.fillRect(Math.random()*VIEW_W, Math.random()*VIEW_H, 1.5, 20);
+    } else if (currentWeather === "Sereno") {
+      let fogGrad = ctx.createLinearGradient(0,0, 0, VIEW_H);
+      fogGrad.addColorStop(0, 'rgba(255,255,255,0.08)'); fogGrad.addColorStop(1, 'rgba(255,255,255,0.02)');
+      ctx.fillStyle = fogGrad; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    }
+
+    // Iluminação Global Translúcida Ajustada
     if(graphicLevel === 3) {
-      ctx.fillStyle = 'rgba(5, 5, 10, 0.4)'; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-      let grad = ctx.createRadialGradient(sx, sy, 2, sx, sy, 90);
-      grad.addColorStop(0, 'rgba(255,255,255,0.9)'); grad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = grad;
-      ctx.beginPath(); ctx.arc(sx, sy, 90, 0, Math.PI*2); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = 'rgba(3, 4, 8, 0.20)'; ctx.fillRect(0, 0, VIEW_W, VIEW_H); 
+      
+      let lightRadius = inventory.ridingCar ? 140 : 100;
+      let lightGrad = ctx.createRadialGradient(sx, sy, 2, sx, sy, lightRadius);
+      lightGrad.addColorStop(0, 'rgba(255,255,255,1)');
+      lightGrad.addColorStop(0.3, 'rgba(255,254,230,0.8)');
+      lightGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      
+      ctx.globalCompositeOperation = 'destination-out'; 
+      ctx.fillStyle = lightGrad; ctx.beginPath(); ctx.arc(sx, sy, lightRadius, 0, Math.PI*2); ctx.fill(); 
+      ctx.globalCompositeOperation = 'source-over';
     }
   }
 
